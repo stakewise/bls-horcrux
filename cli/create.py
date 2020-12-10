@@ -10,7 +10,7 @@ from Crypto.PublicKey.RSA import RsaKey
 from eth_typing import BLSPubkey
 from py_ecc.bls import G2ProofOfPossession as bls_pop
 
-from handle_dispatcher import submit_dispatcher_data, poll_dispatcher
+from cli.handle_dispatcher import submit_dispatcher_data, poll_dispatcher
 from utils import get_bls_secret_shares, rsa_encrypt, rsa_decrypt, PRIME, create_keystore
 
 DATA_DIR = os.environ.get('DATA_DIR', os.path.join(os.getcwd(), 'data'))
@@ -271,7 +271,7 @@ def validate_password(cts: click.Context, param: Any, password: str) -> str:
           'to ask you for your password as otherwise it will appear in your shell history.)'),
     prompt='Enter the password that secures your horcrux keystore',
 )
-def main(
+def create(
         total: int,
         threshold: int,
         my_rsa_public_key_file: str,
@@ -341,7 +341,3 @@ def main(
     with open(keystore_file, 'w') as key_file:
         key_file.write(keystore.as_json())
     print(f'Saved horcrux BLS private key to {keystore_file}')
-
-
-if __name__ == '__main__':
-    main()

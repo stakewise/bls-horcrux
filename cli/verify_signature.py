@@ -27,7 +27,8 @@ DATA_DIR = os.environ.get('DATA_DIR', os.path.join(os.getcwd(), 'data'))
     help='The path to the file where signing data is stored in hexadecimal format',
     type=click.Path(exists=True, file_okay=True, dir_okay=False)
 )
-def main(public_key: str, signature: str, signing_data_file: str) -> None:
+def verify_signature(public_key: str, signature: str, signing_data_file: str) -> None:
+    """Verifies whether the signature for the data corresponds to submitted public key."""
     if not os.path.exists(signing_data_file):
         raise click.BadParameter('Signing data file does not exist')
 
@@ -58,7 +59,3 @@ def main(public_key: str, signature: str, signing_data_file: str) -> None:
         print('[+] The signature is valid')
     else:
         print('[-] The signature is invalid')
-
-
-if __name__ == '__main__':
-    main()

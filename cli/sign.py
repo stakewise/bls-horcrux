@@ -33,7 +33,8 @@ DATA_DIR = os.environ.get('DATA_DIR', os.path.join(os.getcwd(), 'data'))
           ' and wait for the CLI to ask you for your password as otherwise it will appear in your shell history.)'),
     prompt='Enter the keystore password used during your horcrux encryption',
 )
-def main(keystore_file: str, signing_data_file: str, keystore_password: str) -> None:
+def sign(keystore_file: str, signing_data_file: str, keystore_password: str) -> None:
+    """Unlocks the keystore and signs the data."""
     if not os.path.exists(keystore_file):
         raise click.BadParameter('Keystore file does not exist.')
     if not os.path.exists(signing_data_file):
@@ -57,7 +58,3 @@ def main(keystore_file: str, signing_data_file: str, keystore_password: str) -> 
     print('Signature:')
     print('0x' + signature.hex())
     print(f'Horcrux index: {keystore.index}')
-
-
-if __name__ == '__main__':
-    main()

@@ -27,7 +27,8 @@ def reconstruct(signatures):
     help='The total number of signatures to reconstruct the final signature from',
     type=click.INT
 )
-def main(signatures: int) -> None:
+def reconstruct_signature(signatures: int) -> None:
+    """Reconstructs BLS signatures using Shamir's secret sharing."""
     if signatures <= 0:
         raise click.BadParameter('Invalid signatures number.')
 
@@ -64,7 +65,3 @@ def main(signatures: int) -> None:
     reconstructed_signature = reconstruct(points)
     print('Reconstructed signature:')
     print(f'0x{reconstructed_signature.hex()}')
-
-
-if __name__ == '__main__':
-    main()

@@ -75,7 +75,7 @@ def poll_dispatcher(sender_rsa_public_key_hash: str, output_file: str, endpoint:
     help='The file name where the dispatcher output should be saved',
     type=click.Path(exists=False, file_okay=True, dir_okay=False, writable=True, readable=False)
 )
-def main(
+def handle_dispatcher(
         total: int,
         dispatcher_endpoint: str,
         dispatcher_input_file: str,
@@ -102,7 +102,3 @@ def main(
         endpoint=dispatcher_endpoint,
         total=total
     )
-
-
-if __name__ == '__main__':
-    main()
