@@ -1,10 +1,5 @@
 import json
-from dataclasses import (
-    asdict,
-    dataclass,
-    fields,
-    field as dataclass_field
-)
+from dataclasses import asdict, dataclass, fields, field as dataclass_field
 from secrets import randbits
 from typing import Any, Dict, Union
 from unicodedata import normalize
@@ -22,7 +17,7 @@ UNICODE_CONTROL_CHARS = list(range(0x00, 0x20)) + list(range(0x7F, 0xA0))
 # https://github.com/ethereum/eth2.0-deposit-cli/blob/master/eth2deposit/key_handling/keystore.py
 # Commit: b6f7ca9
 
-hexdigits = set('0123456789abcdef')
+hexdigits = set("0123456789abcdef")
 
 
 def encode_bytes(obj: Union[str, Dict[str, Any]]) -> Union[bytes, str, Dict[str, Any]]:
@@ -47,7 +42,9 @@ class BytesDataclass:
         for field in fields(self):
             if field.type in (bytes, Dict[str, Any]):
                 # Convert hexstring to bytes
-                self.__setattr__(field.name, encode_bytes(self.__getattribute__(field.name)))
+                self.__setattr__(
+                    field.name, encode_bytes(self.__getattribute__(field.name))
+                )
 
     def as_json(self) -> str:
         return json.dumps(asdict(self), default=lambda x: x.hex())
@@ -55,7 +52,7 @@ class BytesDataclass:
 
 @dataclass
 class KeystoreModule(BytesDataclass):
-    function: str = ''
+    function: str = ""
     params: Dict[str, Any] = dataclass_field(default_factory=dict)
     message: bytes = bytes()
 
@@ -67,10 +64,10 @@ class KeystoreCrypto(BytesDataclass):
     cipher: KeystoreModule = KeystoreModule()
 
     @classmethod
-    def from_json(cls, json_dict: Dict[Any, Any]) -> 'KeystoreCrypto':
-        kdf = KeystoreModule(**json_dict['kdf'])
-        checksum = KeystoreModule(**json_dict['checksum'])
-        cipher = KeystoreModule(**json_dict['cipher'])
+    def from_json(cls, json_dict: Dict[Any, Any]) -> "KeystoreCrypto":
+        kdf = KeystoreModule(**json_dict["kdf"])
+        checksum = KeystoreModule(**json_dict["checksum"])
+        cipher = KeystoreModule(**json_dict["cipher"])
         return cls(kdf=kdf, checksum=checksum, cipher=cipher)
 
 
@@ -82,21 +79,26 @@ class Keystore(BytesDataclass):
 
     Ref: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2335.md
     """
+
     crypto: KeystoreCrypto = KeystoreCrypto()
-    uuid: str = ''
+    uuid: str = ""
     index: int = 0
     threshold: int = 0
-    public_key: str = ''
+    public_key: str = ""
 
     def kdf(self, **kwargs: Any) -> bytes:
-        return scrypt(**kwargs) if 'scrypt' in self.crypto.kdf.function else PBKDF2(**kwargs)
+        return (
+            scrypt(**kwargs)
+            if "scrypt" in self.crypto.kdf.function
+            else PBKDF2(**kwargs)
+        )
 
     @classmethod
-    def from_json(cls, json_dict: Dict[Any, Any]) -> 'Keystore':
-        crypto = KeystoreCrypto.from_json(json_dict['crypto'])
-        uuid = json_dict['uuid']
-        index = json_dict['index']
-        threshold = json_dict['threshold']
+    def from_json(cls, json_dict: Dict[Any, Any]) -> "Keystore":
+        crypto = KeystoreCrypto.from_json(json_dict["crypto"])
+        uuid = json_dict["uuid"]
+        index = json_dict["index"]
+        threshold = json_dict["threshold"]
         return cls(crypto=crypto, uuid=uuid, index=index, threshold=threshold)
 
     @staticmethod
@@ -105,14 +107,22 @@ class Keystore(BytesDataclass):
         Encode password as NFKD UTF-8 as per:
         https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2335.md#password-requirements
         """
-        password = normalize('NFKD', password)
-        password = ''.join(c for c in password if ord(c) not in UNICODE_CONTROL_CHARS)
-        return password.encode('UTF-8')
+        password = normalize("NFKD", password)
+        password = "".join(c for c in password if ord(c) not in UNICODE_CONTROL_CHARS)
+        return password.encode("UTF-8")
 
     @classmethod
-    def encrypt(cls, *, secret: bytes, password: str, index: int, public_key: str, threshold: int,
-                kdf_salt: bytes = randbits(256).to_bytes(32, 'big'),
-                aes_iv: bytes = randbits(128).to_bytes(16, 'big')) -> 'Keystore':
+    def encrypt(
+        cls,
+        *,
+        secret: bytes,
+        password: str,
+        index: int,
+        public_key: str,
+        threshold: int,
+        kdf_salt: bytes = randbits(256).to_bytes(32, "big"),
+        aes_iv: bytes = randbits(128).to_bytes(16, "big")
+    ) -> "Keystore":
         """
         Encrypt a secret (BLS SK) as an EIP 2335 Keystore.
         """
@@ -121,15 +131,16 @@ class Keystore(BytesDataclass):
         keystore.index = index
         keystore.threshold = threshold
         keystore.public_key = public_key
-        keystore.crypto.kdf.params['salt'] = kdf_salt
+        keystore.crypto.kdf.params["salt"] = kdf_salt
         decryption_key = keystore.kdf(
-            password=cls._process_password(password),
-            **keystore.crypto.kdf.params
+            password=cls._process_password(password), **keystore.crypto.kdf.params
         )
-        keystore.crypto.cipher.params['iv'] = aes_iv
+        keystore.crypto.cipher.params["iv"] = aes_iv
         cipher = AES_128_CTR(key=decryption_key[:16], **keystore.crypto.cipher.params)
         keystore.crypto.cipher.message = cipher.encrypt(secret)
-        keystore.crypto.checksum.message = SHA256(decryption_key[16:32] + keystore.crypto.cipher.message)
+        keystore.crypto.checksum.message = SHA256(
+            decryption_key[16:32] + keystore.crypto.cipher.message
+        )
         return keystore
 
     def decrypt(self, password: str) -> bytes:
@@ -137,10 +148,12 @@ class Keystore(BytesDataclass):
         Retrieve the secret (BLS SK) from the self keystore by decrypting it with `password`
         """
         decryption_key = self.kdf(
-            password=self._process_password(password),
-            **self.crypto.kdf.params
+            password=self._process_password(password), **self.crypto.kdf.params
         )
-        if SHA256(decryption_key[16:32] + self.crypto.cipher.message) != self.crypto.checksum.message:
+        if (
+            SHA256(decryption_key[16:32] + self.crypto.cipher.message)
+            != self.crypto.checksum.message
+        ):
             raise ValueError("Checksum message error")
 
         cipher = AES_128_CTR(key=decryption_key[:16], **self.crypto.cipher.params)
@@ -151,17 +164,13 @@ class Keystore(BytesDataclass):
 class Pbkdf2Keystore(Keystore):
     crypto: KeystoreCrypto = KeystoreCrypto(
         kdf=KeystoreModule(
-            function='pbkdf2',
-            params={
-                'c': 2 ** 18,
-                'dklen': 32,
-                "prf": 'hmac-sha256'
-            },
+            function="pbkdf2",
+            params={"c": 2 ** 18, "dklen": 32, "prf": "hmac-sha256"},
         ),
         checksum=KeystoreModule(
-            function='sha256',
+            function="sha256",
         ),
         cipher=KeystoreModule(
-            function='aes-128-ctr',
-        )
+            function="aes-128-ctr",
+        ),
     )
