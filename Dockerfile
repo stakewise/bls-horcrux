@@ -15,7 +15,7 @@ COPY requirements.txt ./
 # Install build dependencies
 RUN apt-get update && \
   apt-get install -y \
-  # git for installing eth2.0-deposit-cli
+  # git for installing eth2.0-deposit-cli from GitHub
   git \
   gcc \
   && rm -rf /var/lib/apt/lists/*
