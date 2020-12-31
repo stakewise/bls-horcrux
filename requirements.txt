@@ -1,4 +1,5 @@
 click==7.1.2
+eth-typing==2.2.2
 fastapi==0.62.0
 py-ecc==5.1.0
 pycryptodome==3.9.9
