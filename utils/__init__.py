@@ -8,7 +8,7 @@ from eth_typing import BLSPubkey
 from py_ecc import optimized_bls12_381
 from py_ecc.bls import G2ProofOfPossession as bls_pop
 
-from utils.keystore import Pbkdf2Keystore
+from eth2deposit.key_handling.keystore import Pbkdf2Keystore
 
 PRIME = optimized_bls12_381.curve_order
 

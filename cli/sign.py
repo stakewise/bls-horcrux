@@ -4,7 +4,7 @@ import os
 import click
 from py_ecc.bls import G2ProofOfPossession as bls_pop
 
-from utils import Pbkdf2Keystore
+from eth2deposit.key_handling.keystore import Pbkdf2Keystore
 
 DATA_DIR = os.environ.get('DATA_DIR', os.path.join(os.getcwd(), 'data'))
 

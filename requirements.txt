@@ -19,3 +19,4 @@ starlette==0.13.6
 toolz==0.11.1
 urllib3==1.26.2
 uvicorn==0.13.0
+git+https://github.com/ethereum/eth2.0-deposit-cli.git@v1.1.0
