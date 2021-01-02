@@ -4,7 +4,7 @@ from .database import Base
 
 
 class Share(Base):
-    __tablename__ = 'shares'
+    __tablename__ = "shares"
 
     id = Column(Integer, primary_key=True, index=True)
     recipient_rsa_public_key_hash = Column(String)
