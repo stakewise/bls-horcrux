@@ -19,7 +19,7 @@ RUN apt-get update && \
   && rm -rf /var/lib/apt/lists/*
 
 # Install dependencies
-RUN pip install -r requirements.txt
+RUN pip install --require-hashes -r requirements.txt
 
 ####################
 # Production image #
