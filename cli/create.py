@@ -1,12 +1,13 @@
 import json
 import os
 import time
-from typing import Tuple, List, Dict, Any
+from typing import Tuple, List, Dict
 
 import click
-from Crypto.Hash import SHA256
 from Crypto.PublicKey import RSA
 from Crypto.PublicKey.RSA import RsaKey
+from eth2deposit.cli.generate_keys import validate_password
+from eth2deposit.utils.crypto import SHA256
 from eth_typing import BLSPubkey
 from py_ecc.bls import G2ProofOfPossession as bls_pop
 
@@ -77,9 +78,7 @@ def handle_dispatcher(
     :returns data received from the dispatcher, index of the horcrux in shared secret.
     """
     input_data = []
-    my_rsa_public_key_hash = (
-        SHA256.new(my_rsa_public_key.export_key("OpenSSH")).digest().hex()
-    )
+    my_rsa_public_key_hash = SHA256(my_rsa_public_key.export_key("OpenSSH")).hex()
     for i in range(len(all_rsa_public_keys)):
         recipient_rsa_public_key = RSA.import_key(all_rsa_public_keys[i])
         recipient_bls_private_key_share = my_bls_private_key_shares[i]
@@ -98,9 +97,9 @@ def handle_dispatcher(
             data=json.dumps(encrypted_data),
         )
 
-        recipient_rsa_public_key_hash = (
-            SHA256.new(recipient_rsa_public_key.export_key("OpenSSH")).digest().hex()
-        )
+        recipient_rsa_public_key_hash = SHA256(
+            recipient_rsa_public_key.export_key("OpenSSH")
+        ).hex()
         input_data.append(
             {
                 "sender_rsa_public_key_hash": my_rsa_public_key_hash,
@@ -194,49 +193,6 @@ def process_dispatcher_output(
         raise ValueError("Invalid calculated horcrux private key")
 
     return final_public_key, horcrux_private_key
-
-
-def get_password(text: str) -> str:
-    return click.prompt(text, hide_input=True, show_default=False, type=str)
-
-
-def validate_password_strength(password: str) -> None:
-    if len(password) < 8:
-        raise ValueError(
-            f"The password length should be at least 8. Got {len(password)}."
-        )
-
-
-def validate_password(cts: click.Context, param: Any, password: str) -> str:
-    is_valid_password = False
-
-    # The given password has passed confirmation
-    try:
-        validate_password_strength(password)
-    except Exception as e:
-        click.echo(f"Error: {e} Please retype.")
-    else:
-        is_valid_password = True
-
-    while not is_valid_password:
-        password = get_password(
-            text="Type the password that secures your validator keystore(s)"
-        )
-        try:
-            validate_password_strength(password)
-        except Exception as e:
-            click.echo(f"Error: {e} Please retype.")
-        else:
-            # Confirm password
-            password_confirmation = get_password(text="Repeat for confirmation")
-            if password == password_confirmation:
-                is_valid_password = True
-            else:
-                click.echo(
-                    "Error: the two entered values do not match. Please retype again."
-                )
-
-    return password
 
 
 @click.command()
@@ -384,7 +340,11 @@ def create(
 
     # save horcrux private key to the keystore
     keystore = create_keystore(
-        horcrux_private_key, public_key, my_index, threshold, keystore_password
+        private_key=horcrux_private_key,
+        shared_public_key=public_key.hex(),
+        index=my_index,
+        threshold=threshold,
+        password=keystore_password,
     )
     with open(keystore_file, "w") as key_file:
         key_file.write(keystore.as_json())
