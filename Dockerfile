@@ -1,7 +1,7 @@
 ###########
 # Builder #
 ###########
-FROM python:3.8.6-slim AS builder
+FROM python:3.8.7-slim AS builder
 
 WORKDIR /build
 
@@ -24,7 +24,7 @@ RUN pip install --require-hashes -r requirements.txt
 ####################
 # Production image #
 ####################
-FROM python:3.8.6-slim
+FROM python:3.8.7-slim
 
 ENV PATH="/opt/venv/bin:$PATH"
 
