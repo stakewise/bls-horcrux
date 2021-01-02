@@ -1,16 +1,43 @@
+from dataclasses import dataclass
 from random import randint
-from typing import Tuple, List
+from typing import Tuple, List, Dict, Any
 
 from Crypto.Cipher import AES, PKCS1_OAEP
 from Crypto.PublicKey.RSA import RsaKey
 from Crypto.Random import get_random_bytes
+from eth2deposit.key_handling.keystore import Keystore
+from eth2deposit.key_handling.keystore import Pbkdf2Keystore
 from eth_typing import BLSPubkey
 from py_ecc import optimized_bls12_381
 from py_ecc.bls import G2ProofOfPossession as bls_pop
 
-from utils.keystore import Pbkdf2Keystore
-
 PRIME = optimized_bls12_381.curve_order
+
+
+@dataclass
+class HorcruxPbkdf2Keystore(Pbkdf2Keystore):
+    index: int = 0
+    threshold: int = 0
+    shared_public_key: str = ""
+    shared_withdrawal_credentials: str = ""
+
+    @classmethod
+    def encrypt(cls, *, secret: bytes, password: str, **kwargs) -> "Keystore":
+        keystore = super(Pbkdf2Keystore, cls).encrypt(secret=secret, password=password)
+        keystore.index = kwargs.pop("index", 0)
+        keystore.threshold = kwargs.pop("threshold", 0)
+        keystore.shared_public_key = kwargs.pop("shared_public_key", "")
+
+        return keystore
+
+    @classmethod
+    def from_json(cls, json_dict: Dict[Any, Any]) -> "Keystore":
+        keystore = super(Pbkdf2Keystore, cls).from_json(json_dict)
+        keystore.index = json_dict["index"]
+        keystore.threshold = json_dict["threshold"]
+        keystore.shared_public_key = json_dict["shared_public_key"]
+
+        return keystore
 
 
 def get_polynomial_points(coefficients, num_points) -> List[int]:
@@ -75,13 +102,13 @@ def rsa_decrypt(
 
 
 def create_keystore(
-    private_key: int, public_key: BLSPubkey, index: int, threshold: int, password: str
-) -> "Pbkdf2Keystore":
+    private_key: int, shared_public_key: str, index: int, threshold: int, password: str
+) -> "Keystore":
     """:returns new keystore with one key-pair."""
-    return Pbkdf2Keystore.encrypt(
+    return HorcruxPbkdf2Keystore.encrypt(
         secret=private_key.to_bytes(length=32, byteorder="big"),
         password=password,
         index=index,
         threshold=threshold,
-        public_key="0x" + public_key.hex(),
+        shared_public_key=shared_public_key,
     )
