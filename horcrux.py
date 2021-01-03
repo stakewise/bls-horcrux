@@ -15,7 +15,7 @@ def check_python_version() -> None:
     """
     if sys.version_info < (3, 8):
         click.pause(
-            "Your python version is insufficient,"
+            "Your python version is insufficient, "
             "please install version 3.8 or greater."
         )
         sys.exit()
