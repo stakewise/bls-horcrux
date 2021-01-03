@@ -6,7 +6,10 @@ from py_ecc.bls import G2ProofOfPossession as bls_pop
 @click.command()
 @click.option(
     "--public-key",
-    prompt="Enter the hexadecimal encoded shared BLS public key to verify (can be found in horcrux file)",
+    prompt=(
+        "Enter the hexadecimal encoded shared BLS public key to verify "
+        "(can be found in horcrux file)"
+    ),
     help="The hexadecimal encoded BLS public key to verify",
     type=click.STRING,
 )
@@ -23,7 +26,7 @@ from py_ecc.bls import G2ProofOfPossession as bls_pop
     type=click.STRING,
 )
 def verify_signature(public_key: str, signing_data: str, signature: str) -> None:
-    """Verifies whether the signature for the data corresponds to submitted public key."""
+    """Verifies whether the data signature corresponds to the public key."""
     if public_key.startswith("0x"):
         public_key = public_key[2:]
 

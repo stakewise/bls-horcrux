@@ -18,10 +18,10 @@ DATA_DIR = os.environ.get("DATA_DIR", os.path.join(os.getcwd(), "data"))
 @click.password_option(
     "--horcrux-password",
     confirmation_prompt=False,
-    help=(
-        "The password that secures your horcrux keystore. (It is recommended not to use this argument,"
-        " and wait for the CLI to ask you for your password as otherwise it will appear in your shell history.)"
-    ),
+    help="""
+        The password that secures your horcrux keystore.
+        (It is recommended not to use this argument, and wait for the CLI to ask you
+        for your password as otherwise it will appear in your shell history.)""",
     prompt="Enter the horcrux password used during your horcrux creation",
 )
 def sign(horcrux_file: str, horcrux_password: str) -> None:
@@ -34,7 +34,7 @@ def sign(horcrux_file: str, horcrux_password: str) -> None:
         keystore = HorcruxPbkdf2Keystore.from_json(json.load(key_file))
 
     signing_data = click.prompt(
-        text=f"Enter hexadecimal encoded data to sign", type=click.STRING
+        text="Enter hexadecimal encoded data to sign", type=click.STRING
     )
     if signing_data.startswith("0x"):
         signing_data = signing_data[2:]
