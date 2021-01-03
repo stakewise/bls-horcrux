@@ -41,6 +41,6 @@ def create_share(
 @app.get("/{public_key_hash}/", response_model=List[schemas.Share])
 def get_shares(
     public_key_hash: str, db: Session = Depends(get_db)
-) -> List[Tuple[int, str]]:
+) -> List[Tuple[int, str, str, str, str, str, str]]:
     shared = crud.get_shares(db=db, public_key_hash=public_key_hash)
     return shared
