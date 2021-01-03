@@ -17,7 +17,7 @@ that is shared between `m` parties and requires `n out of m` signatures to recon
 ### Option 1. Build `bls-horcrux` with native Python
 
 ```shell script
-pip3 install --require-hashes -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 Or use the helper script:
@@ -38,7 +38,7 @@ source venv/bin/activate
 and install the dependencies:
 
 ```shell script
-pip install --require-hashes -r requirements.txt
+pip install -r requirements.txt
 ```
 
 ### Option 3. Build the docker image
