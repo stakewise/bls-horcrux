@@ -1,4 +1,2 @@
-# W503 line break before binary operator
 [flake8]
 max-line-length = 88
-extend-ignore = W503
