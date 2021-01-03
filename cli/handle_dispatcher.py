@@ -18,7 +18,8 @@ def submit_dispatcher_data(dispatcher_endpoint: str, dispatcher_data: List[Dict]
         response = requests.post(dispatcher_endpoint, json=data)
         if response.status_code != 200:
             print(
-                f"Failed to submit dispatcher data: response status code={response.status_code}"
+                "Failed to submit dispatcher data: "
+                f"response status code={response.status_code}"
             )
             print(f"Response data: {response.json()}")
             exit(1)
@@ -32,7 +33,8 @@ def poll_dispatcher(
     response = requests.get(os.path.join(endpoint, sender_rsa_public_key_hash, ""))
     if response.status_code != 200:
         raise ValueError(
-            f"Failed to retrieve dispatcher output data: status code={response.status_code}"
+            "Failed to retrieve dispatcher output data: "
+            f"status code={response.status_code}"
         )
 
     print("Waiting for other horcruxes to submit their dispatcher data...")
@@ -42,7 +44,8 @@ def poll_dispatcher(
         response = requests.get(os.path.join(endpoint, sender_rsa_public_key_hash, ""))
         if response.status_code != 200:
             raise ValueError(
-                f"Failed to retrieve dispatcher output data: status code={response.status_code}"
+                "Failed to retrieve dispatcher output data: "
+                f"status code={response.status_code}"
             )
         output_data = response.json()
 

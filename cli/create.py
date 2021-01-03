@@ -112,7 +112,8 @@ def handle_dispatcher(
         with open(dispatcher_input_file, "w") as dispatcher_file:
             json.dump(input_data, dispatcher_file)
         print(
-            f"Saved dispatcher input to {dispatcher_input_file}. Submit it to the dispatcher server."
+            f"Saved dispatcher input to {dispatcher_input_file}. "
+            "Submit it to the dispatcher server."
         )
 
         dispatcher_output_file = get_read_file_path(
@@ -204,7 +205,9 @@ def process_dispatcher_output(
 )
 @click.option(
     "--threshold",
-    prompt="Enter the minimum number of horcruxes required for recovering the signature",
+    prompt=(
+        "Enter the minimum number of horcruxes required for recovering the signature"
+    ),
     help="The minimum number of horcruxes required for recovering the signature",
     required=True,
     type=click.INT,
@@ -221,11 +224,12 @@ def process_dispatcher_output(
 @click.password_option(
     "--horcrux-password",
     callback=validate_password,
-    help=(
-        "The password that will secure your horcrux keystore. You will need to re-enter this to decrypt them when "
-        "you will need to sign anything. (It is recommended not to use this argument, and wait for the CLI "
-        "to ask you for your password as otherwise it will appear in your shell history.)"
-    ),
+    help="""
+        The password that will secure your horcrux keystore.
+        You will need to re-enter this to decrypt them when you will need to sign
+        anything. (It is recommended not to use this argument, and wait for the CLI
+        to ask you for your password as otherwise it will appear in your shell history.)
+        """,
     prompt="Enter the password that secures your horcrux keystore",
 )
 def create(
@@ -269,7 +273,8 @@ def create(
         total=total,
     )
 
-    # Process output from the dispatcher to retrieve final shared BLS public key and BLS private key share
+    # Process output from the dispatcher to retrieve final shared BLS public key
+    # and BLS private key share
     public_key, withdrawal_credentials, horcrux_private_key = process_dispatcher_output(
         dispatcher_output=dispatcher_output,
         my_bls_public_key=my_bls_public_key,

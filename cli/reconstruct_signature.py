@@ -10,7 +10,10 @@ from cli.crypto import reconstruct_shared_bls_signature
 @click.command()
 @click.option(
     "--signatures",
-    prompt="Enter the total number of BLS signatures to reconstruct the final signature from",
+    prompt=(
+        "Enter the total number of BLS signatures to reconstruct "
+        "the final signature from"
+    ),
     help="The total number of signatures to reconstruct the final signature from",
     type=click.INT,
 )
@@ -26,7 +29,10 @@ def reconstruct_signature(signatures: int) -> None:
             break
 
         index = click.prompt(
-            text="Enter the horcrux index of the submitted signature (can be found in the owner's horcrux file)",
+            text=(
+                "Enter the horcrux index of the submitted signature "
+                "(can be found in the owner's horcrux file)"
+            ),
             type=click.INT,
         )
         if index in points:
@@ -34,7 +40,10 @@ def reconstruct_signature(signatures: int) -> None:
             continue
 
         signature = click.prompt(
-            text=f"Enter the next hexadecimal encoded BLS signature ({submitted + 1}/{signatures})",
+            text=(
+                "Enter the next hexadecimal encoded BLS signature "
+                f"({submitted + 1}/{signatures})"
+            ),
             type=click.STRING,
         )
         if signature.startswith("0x"):

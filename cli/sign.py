@@ -18,10 +18,10 @@ DATA_DIR = os.environ.get("DATA_DIR", os.path.join(os.getcwd(), "data"))
 @click.password_option(
     "--horcrux-password",
     confirmation_prompt=False,
-    help=(
-        "The password that secures your horcrux keystore. (It is recommended not to use this argument,"
-        " and wait for the CLI to ask you for your password as otherwise it will appear in your shell history.)"
-    ),
+    help="""
+        The password that secures your horcrux keystore.
+        (It is recommended not to use this argument, and wait for the CLI to ask you
+        for your password as otherwise it will appear in your shell history.)""",
     prompt="Enter the horcrux password used during your horcrux creation",
 )
 def sign(horcrux_file: str, horcrux_password: str) -> None:
