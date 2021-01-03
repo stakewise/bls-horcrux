@@ -1,18 +1,18 @@
-from typing import List
+from typing import Iterator, List, Tuple
 
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 
 from . import crud, models, schemas
-from .database import SessionLocal, engine
+from .database import Base, SessionLocal, engine
 
-models.Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
 
 # Dependency
-def get_db():
+def get_db() -> Iterator[Session]:
     db = SessionLocal()
     try:
         yield db
@@ -21,7 +21,9 @@ def get_db():
 
 
 @app.post("/", response_model=schemas.Share)
-def create_share(share: schemas.ShareCreate, db: Session = Depends(get_db)):
+def create_share(
+    share: schemas.ShareCreate, db: Session = Depends(get_db)
+) -> models.Share:
     if (
         crud.get_share(
             db=db,
@@ -37,6 +39,8 @@ def create_share(share: schemas.ShareCreate, db: Session = Depends(get_db)):
 
 
 @app.get("/{public_key_hash}/", response_model=List[schemas.Share])
-def get_shares(public_key_hash: str, db: Session = Depends(get_db)):
+def get_shares(
+    public_key_hash: str, db: Session = Depends(get_db)
+) -> List[Tuple[int, str, str, str, str, str, str]]:
     shared = crud.get_shares(db=db, public_key_hash=public_key_hash)
     return shared
