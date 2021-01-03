@@ -105,7 +105,7 @@ def handle_dispatcher(
         sender_rsa_public_key_hash = input_data[0]["sender_rsa_public_key_hash"]
     else:
         rsa_public_key = click.prompt(
-            text=f"Enter your RSA public key", type=click.STRING
+            text="Enter your RSA public key", type=click.STRING
         )
         sender_rsa_public_key_hash = SHA256(rsa_public_key.encode("ascii")).hex()
 

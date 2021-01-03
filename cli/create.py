@@ -168,7 +168,7 @@ def process_dispatcher_output(
             bls_pop.SkToPk(horcrux_private_key_share)
             != recipient_bls_public_keys[my_index]
         ):
-            raise ValueError(f"Received invalid BLS private key share.")
+            raise ValueError("Received invalid BLS private key share.")
 
         final_public_key_shares.append(bytes.fromhex(data["public_key"]))
         horcrux_public_key_shares.append(recipient_bls_public_keys[my_index])
