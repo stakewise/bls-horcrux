@@ -1,9 +1,10 @@
+from typing import List, Optional, Tuple
 from sqlalchemy.orm import Session
 
 from . import models, schemas
 
 
-def create_share(db: Session, share: schemas.ShareCreate):
+def create_share(db: Session, share: schemas.ShareCreate) -> models.Share:
     db_share = models.Share(**share.dict())
     db.add(db_share)
     db.commit()
@@ -11,7 +12,7 @@ def create_share(db: Session, share: schemas.ShareCreate):
     return db_share
 
 
-def get_shares(db: Session, public_key_hash: str):
+def get_shares(db: Session, public_key_hash: str) -> List[Tuple[int, str]]:
     return (
         db.query(models.Share)
         .filter(models.Share.recipient_rsa_public_key_hash == public_key_hash)
@@ -21,7 +22,7 @@ def get_shares(db: Session, public_key_hash: str):
 
 def get_share(
     db: Session, sender_rsa_public_key_hash: str, recipient_rsa_public_key_hash: str
-):
+) -> Optional[Tuple[int, str]]:
     return (
         db.query(models.Share)
         .filter(
