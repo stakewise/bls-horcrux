@@ -4,7 +4,7 @@ if [[ "$OSTYPE" == "linux"* ]] || [[ "$OSTYPE" == "linux-android"* ]] || [[ "$OS
     echo $OSTYPE
     if [[ $1 == "install" ]]; then
         echo "Installing dependencies..."
-        pip3 install -r requirements.txt
+        pip3 install --require-hashes -r requirements.txt
         exit 1
     fi
     echo "Running BLS horcrux..."
@@ -14,7 +14,7 @@ elif [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "cygwin" ]]; then
     echo $OSTYPE
     if [[ $1 == "install" ]]; then
         echo "Installing dependencies..."
-        pip install -r requirements.txt
+        pip install --require-hashes -r requirements.txt
         exit 1
     fi
     echo "Running BLS horcrux..."
