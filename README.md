@@ -5,7 +5,7 @@
 `bls-horcrux` is a tool for creating a threshold BLS key in a trustless manner. It
 uses [Shamir's secret sharing](https://launchpad.ethereum.org/faq#keys)
 and [BLS properties](https://blog.dash.org/secret-sharing-and-threshold-signatures-with-bls-954d1587b5f) to create a key
-which is shared between `m` parties and requires `n out of m` signatures to reconstruct the final signature.
+that is shared between `m` parties and requires `n out of m` signatures to reconstruct the final signature.
 
 ## Installation
 
@@ -38,7 +38,7 @@ source venv/bin/activate
 and install the dependencies:
 
 ```shell script
-pip install --require-hashes -r requirements.txt
+pip install -r requirements.txt
 ```
 
 ### Option 3. Build the docker image
@@ -151,7 +151,7 @@ Before BLS horcruxes can be generated, their holders must agree on the following
         Saved dispatcher output data to /bls-horcrux/data/dispatcher_output.json
         Move it to your offline machine to process.
         ```
-    - Move dispatcher output to offline machine and specify the path to it:
+    - Move dispatcher output to an offline machine and specify the path to it:
         ```shell script
         Enter path to the dispatcher output data [/bls-horcrux/data/dispatcher_output.json]:
         ```
@@ -169,7 +169,7 @@ Before BLS horcruxes can be generated, their holders must agree on the following
    The generated withdrawal credentials can be used in the ETH2 validator's deposit data and only the threshold of
    horcruxes specified in `step 1` will be able to withdraw its funds.
 
-    **NB! Forgetting the password or losing access to the keystore file will make the horcrux irrecoverable.**
+   **NB! Forgetting the password or losing access to the keystore file will make the horcrux irrecoverable.**
 
 ## Signing data
 
@@ -188,7 +188,8 @@ Horcrux index: 0
 
 ## Reconstructing threshold signature
 
-To reconstruct a final signature, collect signatures and indexes from other horcruxes (as in section above) and call:
+To reconstruct a final signature, collect signatures and indexes from other horcruxes (as in the section above) and
+call:
 
  ```shell script
  ./horcrux.sh reconstruct-signature
@@ -203,13 +204,14 @@ To reconstruct a final signature, collect signatures and indexes from other horc
  Enter the next hexadecimal encoded BLS signature (3/3): 0x80e9b13f5a81e678d797b59c76e70c1d8bc385a6d253917a651a7738487a7ab8bd70f6246e8adfeb0f22a35eb4f6eab61474c7f6d73bf68456f4fe04ce9055e302de86cd3186993ac86c77dacc38ed3d648c57d602f903071253439e7cff158b
  Reconstructed signature: 0xad9c32db5ba78df50b058c4b659ec1f708e1c6f821c163e1dc60a9e54dcb7f575d44083c8de3dda188fe7a2c9c641a7c00b11136c6dc1cbd6a851d1087e88d18c0b5a59229073e885dde8358e44459c68c8b8bfdaf5e60853238451ce7264d4d
  ```
+
 **NB!** Number of signatures should be at least equal to the amount specified in `threshold` from `step 1`
 of `Creating Horcrux` section. The data signed must be the same for all the participants.
 
 ## Verifying threshold signature
 
-To verify the signature, copy the value of shared BLS public key (`shared_public_key`) from the horcrux keystore and
-   call:
+To verify the signature, copy the value of the shared BLS public key (`shared_public_key`) from the horcrux keystore and
+call:
 
 ```shell script
 ./horcrux.sh verify-signature
