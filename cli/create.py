@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Tuple, List, Dict
+from typing import Any, Dict, List, Tuple
 
 import click
 from Crypto.PublicKey import RSA
@@ -8,17 +8,17 @@ from Crypto.PublicKey.RSA import RsaKey
 from eth2deposit.cli.generate_keys import validate_password
 from eth2deposit.utils.constants import BLS_WITHDRAWAL_PREFIX
 from eth2deposit.utils.crypto import SHA256
-from eth_typing import BLSPubkey
-from py_ecc.bls import G2ProofOfPossession as bls_pop
+from eth_typing.bls import BLSPubkey
+from py_ecc.bls.ciphersuites import G2ProofOfPossession as bls_pop
 
 from cli.crypto import (
-    get_bls_secret_shares,
-    rsa_encrypt,
-    rsa_decrypt,
     PRIME,
     create_keystore,
+    get_bls_secret_shares,
+    rsa_decrypt,
+    rsa_encrypt,
 )
-from cli.handle_dispatcher import submit_dispatcher_data, poll_dispatcher
+from cli.handle_dispatcher import poll_dispatcher, submit_dispatcher_data
 from cli.utils import get_read_file_path, get_write_file_path
 
 DATA_DIR = os.environ.get("DATA_DIR", os.path.join(os.getcwd(), "data"))
@@ -136,7 +136,7 @@ def handle_dispatcher(
 
 
 def process_dispatcher_output(
-    dispatcher_output: List[Dict],
+    dispatcher_output: List[Dict[str, Any]],
     my_bls_public_key: BLSPubkey,
     my_bls_public_key_shares: List[BLSPubkey],
     my_bls_private_key_shares: List[int],
@@ -171,8 +171,8 @@ def process_dispatcher_output(
         ):
             raise ValueError("Received invalid BLS private key share.")
 
-        final_public_key_shares.append(bytes.fromhex(data["public_key"]))
-        horcrux_public_key_shares.append(recipient_bls_public_keys[my_index])
+        final_public_key_shares.append(BLSPubkey(bytes.fromhex(data["public_key"])))
+        horcrux_public_key_shares.append(BLSPubkey(recipient_bls_public_keys[my_index]))
         horcrux_private_key_shares.append(horcrux_private_key_share)
 
     final_public_key = bls_pop._AggregatePKs(final_public_key_shares)

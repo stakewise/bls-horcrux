@@ -1,8 +1,8 @@
 from typing import Dict
 
 import click
-from eth_typing import BLSSignature
-from py_ecc.bls import G2ProofOfPossession as bls_pop
+from eth_typing.bls import BLSSignature
+from py_ecc.bls.ciphersuites import G2ProofOfPossession as bls_pop
 
 from cli.crypto import reconstruct_shared_bls_signature
 

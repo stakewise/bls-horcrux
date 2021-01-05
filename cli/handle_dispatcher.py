@@ -1,18 +1,20 @@
 import json
 import os
 import time
-from typing import Dict, List
+from typing import Any, Dict, List
 
 import click
 import requests
 from eth2deposit.utils.crypto import SHA256
 
-from cli.utils import get_write_file_path, get_read_file_path
+from cli.utils import get_read_file_path, get_write_file_path
 
 DATA_DIR = os.environ.get("DATA_DIR", os.path.join(os.getcwd(), "data"))
 
 
-def submit_dispatcher_data(dispatcher_endpoint: str, dispatcher_data: List[Dict]):
+def submit_dispatcher_data(
+    dispatcher_endpoint: str, dispatcher_data: List[Dict[str, Any]]
+) -> None:
     """Submits data to the dispatcher server."""
     for data in dispatcher_data:
         response = requests.post(dispatcher_endpoint, json=data)
