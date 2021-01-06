@@ -1,6 +1,6 @@
 import click
-from eth_typing import BLSPubkey, BLSSignature
-from py_ecc.bls import G2ProofOfPossession as bls_pop
+from eth_typing.bls import BLSPubkey, BLSSignature
+from py_ecc.bls.ciphersuites import G2ProofOfPossession as bls_pop
 
 
 @click.command()
@@ -30,23 +30,23 @@ def verify_signature(public_key: str, signing_data: str, signature: str) -> None
     if public_key.startswith("0x"):
         public_key = public_key[2:]
 
-    public_key = BLSPubkey(bytes.fromhex(public_key))
-    if not bls_pop._is_valid_pubkey(public_key):
+    bls_public_key = BLSPubkey(bytes.fromhex(public_key))
+    if not bls_pop._is_valid_pubkey(bls_public_key):
         raise click.BadParameter("Invalid BLS public key")
 
     if signature.startswith("0x"):
         signature = signature[2:]
 
-    signature = BLSSignature(bytes.fromhex(signature))
-    if not bls_pop._is_valid_signature(signature):
+    bls_signature = BLSSignature(bytes.fromhex(signature))
+    if not bls_pop._is_valid_signature(bls_signature):
         raise click.BadParameter("Invalid BLS signature")
 
     if signing_data.startswith("0x"):
         signing_data = signing_data[2:]
 
-    signing_data = bytes.fromhex(signing_data)
-
-    if bls_pop.Verify(public_key, signing_data, signature):
+    if bls_pop.Verify(
+        PK=bls_public_key, message=bytes.fromhex(signing_data), signature=bls_signature
+    ):
         print("[+] The signature is valid")
     else:
         print("[-] The signature is invalid")

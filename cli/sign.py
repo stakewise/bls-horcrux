@@ -2,7 +2,7 @@ import json
 import os
 
 import click
-from py_ecc.bls import G2ProofOfPossession as bls_pop
+from py_ecc.bls.ciphersuites import G2ProofOfPossession as bls_pop
 
 from cli.crypto import HorcruxPbkdf2Keystore
 
