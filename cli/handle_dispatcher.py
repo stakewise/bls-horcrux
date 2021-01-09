@@ -64,7 +64,7 @@ def poll_dispatcher(
         with open(dispatcher_output_file, "w") as dispatcher_file:
             json.dump(output_data, dispatcher_file)
         click.echo(
-            "Saved dispatcher output data to"
+            "Saved dispatcher output data to "
             f"{click.style(f'{dispatcher_output_file}', fg='green')}"
         )
         click.echo("Move it to your offline machine to process.")
