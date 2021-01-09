@@ -24,7 +24,7 @@ class HorcruxPbkdf2Keystore(Pbkdf2Keystore):  # type: ignore
     shared_withdrawal_credentials: str = ""
 
     @classmethod
-    def encrypt(cls, *, secret: bytes, password: str, **kwargs: Any) -> "Keystore":
+    def encrypt(cls, *, secret: bytes, password: str, **kwargs: Any) -> Keystore:
         keystore = super(Pbkdf2Keystore, cls).encrypt(secret=secret, password=password)
         keystore.index = kwargs.pop("index", 0)
         keystore.threshold = kwargs.pop("threshold", 0)
@@ -36,7 +36,7 @@ class HorcruxPbkdf2Keystore(Pbkdf2Keystore):  # type: ignore
         return keystore
 
     @classmethod
-    def from_json(cls, json_dict: Dict[Any, Any]) -> "Keystore":
+    def from_json(cls, json_dict: Dict[Any, Any]) -> Keystore:
         keystore = super(Pbkdf2Keystore, cls).from_json(json_dict)
         keystore.index = json_dict["index"]
         keystore.threshold = json_dict["threshold"]
