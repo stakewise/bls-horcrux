@@ -19,13 +19,14 @@ def submit_dispatcher_data(
     for data in dispatcher_data:
         response = requests.post(dispatcher_endpoint, json=data)
         if response.status_code != 200:
-            print(
+            click.secho(
                 "Failed to submit dispatcher data: "
-                f"response status code={response.status_code}"
+                f"response status code={response.status_code}",
+                fg="red",
             )
-            print(f"Response data: {response.json()}")
+            click.echo(f"Response data: {response.json()}")
             exit(1)
-    print("Successfully submitted dispatcher data")
+    click.secho("Successfully submitted dispatcher data", fg="green")
 
 
 def poll_dispatcher(
@@ -39,7 +40,7 @@ def poll_dispatcher(
             f"status code={response.status_code}"
         )
 
-    print("Waiting for other horcruxes to submit their dispatcher data...")
+    click.echo("Waiting for other horcruxes to submit their dispatcher data...")
     output_data = response.json()
     while len(output_data) != total - 1:
         time.sleep(5)
@@ -62,8 +63,11 @@ def poll_dispatcher(
 
         with open(dispatcher_output_file, "w") as dispatcher_file:
             json.dump(output_data, dispatcher_file)
-        print(f"Saved dispatcher output data to {dispatcher_output_file}")
-        print("Move it to your offline machine to process.")
+        click.echo(
+            "Saved dispatcher output data to "
+            f"{click.style(f'{dispatcher_output_file}', fg='green')}"
+        )
+        click.echo("Move it to your offline machine to process.")
 
     return output_data
 

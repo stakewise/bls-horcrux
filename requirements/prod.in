@@ -8,4 +8,5 @@ requests==2.25.1
 SQLAlchemy==1.3.22
 uvicorn==0.13.3
 ssz==0.2.4
+colorama==0.4.4
 https://github.com/ethereum/eth2.0-deposit-cli/archive/v1.1.0.zip

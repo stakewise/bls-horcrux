@@ -36,7 +36,7 @@ def reconstruct_signature(signatures: int) -> None:
             type=click.INT,
         )
         if index in points:
-            print("The signature for such index was already submitted")
+            click.echo("The signature for such index was already submitted")
             continue
 
         signature = click.prompt(
@@ -51,7 +51,7 @@ def reconstruct_signature(signatures: int) -> None:
 
         signature = BLSSignature(bytes.fromhex(signature))
         if not bls_pop._is_valid_signature(signature):
-            print("The signature is invalid. Please try again.")
+            click.secho("The signature is invalid. Please try again.", fg="red")
             continue
 
         points[index] = signature
@@ -60,4 +60,7 @@ def reconstruct_signature(signatures: int) -> None:
     # reconstruct signature using Shamir's secret sharing
 
     reconstructed_signature = reconstruct_shared_bls_signature(points)
-    print(f"Reconstructed signature: 0x{reconstructed_signature.hex()}")
+    click.echo(
+        "Reconstructed signature: "
+        f"{click.style(f'0x{reconstructed_signature.hex()}', fg='green')}"
+    )
