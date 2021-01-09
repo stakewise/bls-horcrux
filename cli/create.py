@@ -180,11 +180,17 @@ def process_dispatcher_output(
         horcrux_private_key_shares.append(horcrux_private_key_share)
 
     final_public_key = bls_pop._AggregatePKs(final_public_key_shares)
-    click.echo(f"Shared BLS Public Key: 0x{final_public_key.hex()}")
+    click.echo(
+        "Shared BLS Public Key: "
+        f"{click.style(f'0x{final_public_key.hex()}', fg='green')}"
+    )
 
     withdrawal_credentials = BLS_WITHDRAWAL_PREFIX
     withdrawal_credentials += SHA256(final_public_key)[1:]
-    click.echo(f"Withdrawal Credentials: 0x{withdrawal_credentials.hex()}")
+    click.echo(
+        "Withdrawal Credentials: "
+        f"{click.style(f'0x{withdrawal_credentials.hex()}', fg='green')}"
+    )
 
     horcrux_private_key = 0
     for private_key_share in horcrux_private_key_shares:
@@ -306,7 +312,7 @@ def create(
         os.mkdir(DATA_DIR)
     with open(keystore_file, "w") as key_file:
         key_file.write(keystore.as_json())
-    click.echo(f"Saved horcrux to {keystore_file}")
+    click.echo(f"Saved horcrux to {click.style(f'{keystore_file}', fg='green')}")
     click.echo(
         "The horcrux file must be stored in a secure place."
         " There will be no way to recover the horcrux if the file will be lost."

@@ -60,4 +60,7 @@ def reconstruct_signature(signatures: int) -> None:
     # reconstruct signature using Shamir's secret sharing
 
     reconstructed_signature = reconstruct_shared_bls_signature(points)
-    click.echo(f"Reconstructed signature: 0x{reconstructed_signature.hex()}")
+    click.echo(
+        "Reconstructed signature: "
+        f"{click.style(f'0x{reconstructed_signature.hex()}', fg='green')}"
+    )
