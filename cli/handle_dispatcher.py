@@ -19,9 +19,10 @@ def submit_dispatcher_data(
     for data in dispatcher_data:
         response = requests.post(dispatcher_endpoint, json=data)
         if response.status_code != 200:
-            click.echo(
+            click.secho(
                 "Failed to submit dispatcher data: "
-                f"response status code={response.status_code}"
+                f"response status code={response.status_code}",
+                fg="red",
             )
             click.echo(f"Response data: {response.json()}")
             exit(1)
