@@ -49,4 +49,4 @@ def verify_signature(public_key: str, signing_data: str, signature: str) -> None
     ):
         click.secho("[+] The signature is valid", fg="green")
     else:
-        click.echo("[-] The signature is invalid")
+        click.secho("[-] The signature is invalid", fg="red")
