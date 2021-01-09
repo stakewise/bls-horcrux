@@ -29,12 +29,12 @@ def handle_rsa_keys(total: int) -> Tuple[RsaKey, RsaKey, List[str]]:
     Generates RSA keypair for communicating with other horcruxes
     and retrieves all the other horcruxes RSA public keys.
     """
-    print("Generating RSA key for communicating with other horcruxes...")
+    click.echo("Generating RSA key for communicating with other horcruxes...")
     my_rsa_private_key = RSA.generate(4096)
     my_rsa_public_key = my_rsa_private_key.publickey()
 
-    print(f'\n\n{my_rsa_public_key.export_key("OpenSSH").decode("ascii")}')
-    print("\n\nShare the RSA public key above with all other horcruxes")
+    click.echo(f'\n\n{my_rsa_public_key.export_key("OpenSSH").decode("ascii")}')
+    click.echo("\n\nShare the RSA public key above with all other horcruxes")
 
     my_rsa_public_key_file = get_read_file_path(
         "Enter path to the file with all the RSA public keys",
@@ -111,7 +111,7 @@ def handle_dispatcher(
             os.mkdir(DATA_DIR)
         with open(dispatcher_input_file, "w") as dispatcher_file:
             json.dump(input_data, dispatcher_file)
-        print(
+        click.echo(
             f"Saved dispatcher input to {dispatcher_input_file}. "
             "Submit it to the dispatcher server."
         )
@@ -176,11 +176,11 @@ def process_dispatcher_output(
         horcrux_private_key_shares.append(horcrux_private_key_share)
 
     final_public_key = bls_pop._AggregatePKs(final_public_key_shares)
-    print(f"Shared BLS Public Key: 0x{final_public_key.hex()}")
+    click.echo(f"Shared BLS Public Key: 0x{final_public_key.hex()}")
 
     withdrawal_credentials = BLS_WITHDRAWAL_PREFIX
     withdrawal_credentials += SHA256(final_public_key)[1:]
-    print(f"Withdrawal Credentials: 0x{withdrawal_credentials.hex()}")
+    click.echo(f"Withdrawal Credentials: 0x{withdrawal_credentials.hex()}")
 
     horcrux_private_key = 0
     for private_key_share in horcrux_private_key_shares:
@@ -250,7 +250,7 @@ def create(
     # RSA keys are used for encrypting/decrypting messages for other horcrux holders
     my_rsa_private_key, my_rsa_public_key, all_rsa_public_keys = handle_rsa_keys(total)
 
-    print(
+    click.echo(
         f"Generating intermediate BLS keypair with Shamir's secret sharing:"
         f" total shares={total}, threshold={threshold}"
     )
@@ -302,9 +302,9 @@ def create(
         os.mkdir(DATA_DIR)
     with open(keystore_file, "w") as key_file:
         key_file.write(keystore.as_json())
-    print(f"Saved horcrux to {keystore_file}")
-    print(
+    click.echo(f"Saved horcrux to {keystore_file}")
+    click.echo(
         "The horcrux file must be stored in a secure place."
         " There will be no way to recover the horcrux if the file will be lost."
     )
-    print("Forgetting your password will also make your horcrux irrecoverable.")
+    click.echo("Forgetting your password will also make your horcrux irrecoverable.")

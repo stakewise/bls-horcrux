@@ -43,5 +43,5 @@ def sign(horcrux_file: str, horcrux_password: str) -> None:
     private_key = int.from_bytes(keystore.decrypt(horcrux_password), "big")
     signature = bls_pop.Sign(private_key, bytes.fromhex(signing_data))
 
-    print(f"Signature: 0x{signature.hex()}")
-    print(f"Horcrux index: {keystore.index}")
+    click.echo(f"Signature: 0x{signature.hex()}")
+    click.echo(f"Horcrux index: {keystore.index}")
