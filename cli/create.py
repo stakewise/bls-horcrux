@@ -112,7 +112,7 @@ def handle_dispatcher(
         with open(dispatcher_input_file, "w") as dispatcher_file:
             json.dump(input_data, dispatcher_file)
         click.echo(
-            f"Saved dispatcher input to {dispatcher_input_file}. "
+            "Saved dispatcher input to " + click.style(dispatcher_input_file, fg="green")
             "Submit it to the dispatcher server."
         )
 
