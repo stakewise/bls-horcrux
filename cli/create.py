@@ -33,7 +33,7 @@ def handle_rsa_keys(total: int) -> Tuple[RsaKey, RsaKey, List[str]]:
     my_rsa_private_key = RSA.generate(4096)
     my_rsa_public_key = my_rsa_private_key.publickey()
 
-    click.echo(f'\n\n{my_rsa_public_key.export_key("OpenSSH").decode("ascii")}')
+    click.secho(f'\n\n{my_rsa_public_key.export_key("OpenSSH").decode("ascii")}', fg="green")
     click.echo("\n\nShare the RSA public key above with all other horcruxes")
 
     my_rsa_public_key_file = get_read_file_path(
