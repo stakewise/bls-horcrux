@@ -19,7 +19,8 @@ RUN apt-get update && \
   && rm -rf /var/lib/apt/lists/*
 
 # Install dependencies
-RUN pip install --require-hashes -r prod.txt
+RUN pip install --upgrade --no-cache-dir pip wheel && \
+  pip install --require-hashes -r prod.txt
 
 ####################
 # Production image #
