@@ -47,6 +47,6 @@ def verify_signature(public_key: str, signing_data: str, signature: str) -> None
     if bls_pop.Verify(
         PK=bls_public_key, message=bytes.fromhex(signing_data), signature=bls_signature
     ):
-        click.echo("[+] The signature is valid")
+        click.secho("[+] The signature is valid", fg="green")
     else:
         click.echo("[-] The signature is invalid")
