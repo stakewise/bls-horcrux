@@ -51,7 +51,7 @@ def reconstruct_signature(signatures: int) -> None:
 
         signature = BLSSignature(bytes.fromhex(signature))
         if not bls_pop._is_valid_signature(signature):
-            click.echo("The signature is invalid. Please try again.")
+            click.secho("The signature is invalid. Please try again.", fg="red")
             continue
 
         points[index] = signature
