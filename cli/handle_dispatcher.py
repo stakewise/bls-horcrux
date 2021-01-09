@@ -26,7 +26,7 @@ def submit_dispatcher_data(
             )
             click.echo(f"Response data: {response.json()}")
             exit(1)
-    click.echo("Successfully submitted dispatcher data")
+    click.secho("Successfully submitted dispatcher data", fg="green")
 
 
 def poll_dispatcher(
