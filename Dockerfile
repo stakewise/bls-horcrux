@@ -10,7 +10,7 @@ RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Copy requirements
-COPY requirements.txt ./
+COPY requirements/prod.txt ./
 
 # Install build dependencies
 RUN apt-get update && \
@@ -19,7 +19,8 @@ RUN apt-get update && \
   && rm -rf /var/lib/apt/lists/*
 
 # Install dependencies
-RUN pip install --require-hashes -r requirements.txt
+RUN pip install --upgrade --no-cache-dir pip wheel && \
+  pip install --require-hashes -r prod.txt
 
 ####################
 # Production image #
