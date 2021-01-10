@@ -1,6 +1,6 @@
 .PHONY: lint
 lint:
-	black . --exclude=eth2deposit --check
+	black . --check
 	flake8
 	mypy dispatcher cli *.py
 

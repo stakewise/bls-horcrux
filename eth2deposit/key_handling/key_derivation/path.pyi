@@ -1,6 +1,0 @@
-from .mnemonic import get_seed as get_seed
-from .tree import derive_child_SK as derive_child_SK, derive_master_SK as derive_master_SK
-from typing import List
-
-def path_to_nodes(path: str) -> List[int]: ...
-def mnemonic_and_path_to_key(mnemonic: str, path: str, password: str) -> int: ...

@@ -23,7 +23,7 @@ DEFAULT_SHARED_WITHDRAWAL_CREDS = ""
 
 
 @dataclass
-class HorcruxPbkdf2Keystore(Pbkdf2Keystore):
+class HorcruxPbkdf2Keystore(Pbkdf2Keystore):  # type: ignore
     index: int = DEFAULT_INDEX
     threshold: int = DEFAULT_THRESHOLD
     shared_public_key: str = DEFAULT_SHARED_PUBLIC_KEY
