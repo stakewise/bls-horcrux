@@ -313,8 +313,11 @@ def create(
     with open(keystore_file, "w") as key_file:
         key_file.write(keystore.as_json())
     click.echo(f"Saved horcrux to {click.style(f'{keystore_file}', fg='green')}")
-    click.echo(
+    click.secho(
         "The horcrux file must be stored in a secure place."
-        " There will be no way to recover the horcrux if the file will be lost."
+        " There will be no way to recover the horcrux if the file will be lost.",
+        fg="blue",
     )
-    click.echo("Forgetting your password will also make your horcrux irrecoverable.")
+    click.secho(
+        "Forgetting your password will also make your horcrux irrecoverable.", fg="blue"
+    )
