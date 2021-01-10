@@ -27,6 +27,7 @@ from py_ecc.bls.ciphersuites import G2ProofOfPossession as bls_pop
 )
 def verify_signature(public_key: str, signing_data: str, signature: str) -> None:
     """Verifies whether the data signature corresponds to the public key."""
+    public_key = public_key.strip()
     if public_key.startswith("0x"):
         public_key = public_key[2:]
 
@@ -34,6 +35,7 @@ def verify_signature(public_key: str, signing_data: str, signature: str) -> None
     if not bls_pop._is_valid_pubkey(bls_public_key):
         raise click.BadParameter("Invalid BLS public key")
 
+    signature = signature.strip()
     if signature.startswith("0x"):
         signature = signature[2:]
 
@@ -41,6 +43,7 @@ def verify_signature(public_key: str, signing_data: str, signature: str) -> None
     if not bls_pop._is_valid_signature(bls_signature):
         raise click.BadParameter("Invalid BLS signature")
 
+    signing_data = signing_data.strip()
     if signing_data.startswith("0x"):
         signing_data = signing_data[2:]
 

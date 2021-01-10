@@ -101,6 +101,7 @@ def handle_dispatcher(
     Sends data to the dispatcher and retrieves the output designated to the horcrux.
     Should only be used when creating horcrux in offline mode.
     """
+    dispatcher_endpoint = dispatcher_endpoint.strip()
 
     if submit_dispatcher_input:
         dispatcher_input_file = get_read_file_path(
@@ -115,7 +116,7 @@ def handle_dispatcher(
     else:
         rsa_public_key = click.prompt(
             text="Enter your RSA public key", type=click.STRING
-        )
+        ).strip()
         sender_rsa_public_key_hash = SHA256(rsa_public_key.encode("ascii")).hex()
 
     poll_dispatcher(

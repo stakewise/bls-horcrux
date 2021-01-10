@@ -127,7 +127,7 @@ def handle_dispatcher(
         with open(dispatcher_output_file, "r") as output_file:
             dispatcher_output_data = json.load(output_file)
     else:
-        endpoint = click.prompt("Enter dispatcher endpoint", type=click.STRING)
+        endpoint = click.prompt("Enter dispatcher endpoint", type=click.STRING).strip()
         submit_dispatcher_data(endpoint, input_data)
         dispatcher_output_data = poll_dispatcher(
             sender_rsa_public_key_hash=my_rsa_public_key_hash,
