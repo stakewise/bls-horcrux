@@ -30,7 +30,7 @@ class HorcruxPbkdf2Keystore(Pbkdf2Keystore):  # type: ignore
     shared_withdrawal_credentials: str = DEFAULT_SHARED_WITHDRAWAL_CREDS
 
     @classmethod
-    def from_private_key(
+    def create_from_private_key(
         cls,
         *,
         private_key: int,

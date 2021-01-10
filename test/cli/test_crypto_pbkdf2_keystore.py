@@ -73,7 +73,7 @@ def test_it_creates_keystore_from_private_key():
     shared_withdrawal_credentials = "any_withdrawal_creds"
 
     # when
-    result = HorcruxPbkdf2Keystore.from_private_key(
+    result = HorcruxPbkdf2Keystore.create_from_private_key(
         private_key=private_key,
         password=password,
         index=index,

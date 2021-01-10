@@ -295,7 +295,7 @@ def create(
     )
 
     # save horcrux private key to the keystore
-    keystore = HorcruxPbkdf2Keystore.from_private_key(
+    keystore = HorcruxPbkdf2Keystore.create_from_private_key(
         private_key=horcrux_private_key,
         shared_public_key=public_key.hex(),
         shared_withdrawal_credentials=withdrawal_credentials.hex(),
