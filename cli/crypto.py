@@ -24,6 +24,8 @@ DEFAULT_SHARED_WITHDRAWAL_CREDS = ""
 
 @dataclass
 class HorcruxPbkdf2Keystore(Pbkdf2Keystore):  # type: ignore
+    """Used for encrypting the private key and storing it in the keystore file."""
+
     index: int = DEFAULT_INDEX
     threshold: int = DEFAULT_THRESHOLD
     shared_public_key: str = DEFAULT_SHARED_PUBLIC_KEY
