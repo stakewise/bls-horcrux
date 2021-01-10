@@ -31,7 +31,7 @@ def sign(horcrux_file: str, horcrux_password: str) -> None:
 
     # read keystore from file
     with open(horcrux_file, "r") as key_file:
-        keystore = HorcruxPbkdf2Keystore.from_json(json.load(key_file))
+        keystore = HorcruxPbkdf2Keystore.create_from_json(json.load(key_file))
 
     signing_data = click.prompt(
         text="Enter hexadecimal encoded data to sign", type=click.STRING

@@ -42,7 +42,7 @@ def test_it_creates_keystore_from_json():
     }
 
     # when
-    result = HorcruxPbkdf2Keystore.from_json(json_dict=json_dict)
+    result = HorcruxPbkdf2Keystore.create_from_json(json_dict=json_dict)
 
     # then
     assert isinstance(result, HorcruxPbkdf2Keystore)
