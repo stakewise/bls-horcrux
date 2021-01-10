@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from random import randint
 from typing import Any, Dict, List, Tuple, cast
@@ -6,7 +8,7 @@ from Crypto.Cipher import AES, PKCS1_OAEP
 from Crypto.Cipher._mode_eax import EaxMode
 from Crypto.PublicKey.RSA import RsaKey
 from Crypto.Random import get_random_bytes
-from eth2deposit.key_handling.keystore import Keystore, Pbkdf2Keystore
+from eth2deposit.key_handling.keystore import Pbkdf2Keystore
 from eth_typing.bls import BLSPubkey, BLSSignature
 from py_ecc.bls.ciphersuites import G2ProofOfPossession as bls_pop
 from py_ecc.bls.g2_primitives import G2_to_signature, signature_to_G2
@@ -14,57 +16,65 @@ from py_ecc.optimized_bls12_381.optimized_curve import Z2, add, curve_order, mul
 from py_ecc.utils import prime_field_inv
 
 PRIME = curve_order
+DEFAULT_INDEX = 0
+DEFAULT_THRESHOLD = 0
+DEFAULT_SHARED_PUBLIC_KEY = ""
+DEFAULT_SHARED_WITHDRAWAL_CREDS = ""
 
 
 @dataclass
-class HorcruxPbkdf2Keystore(Pbkdf2Keystore):  # type: ignore
-    index: int = 0
-    threshold: int = 0
-    shared_public_key: str = ""
-    shared_withdrawal_credentials: str = ""
+class HorcruxPbkdf2Keystore(Pbkdf2Keystore):
+    index: int = DEFAULT_INDEX
+    threshold: int = DEFAULT_THRESHOLD
+    shared_public_key: str = DEFAULT_SHARED_PUBLIC_KEY
+    shared_withdrawal_credentials: str = DEFAULT_SHARED_WITHDRAWAL_CREDS
 
     @classmethod
-    def encrypt(cls, *, secret: bytes, password: str, **kwargs: Any) -> Keystore:
-        keystore = super(Pbkdf2Keystore, cls).encrypt(secret=secret, password=password)
-        keystore.index = kwargs.pop("index", 0)
-        keystore.threshold = kwargs.pop("threshold", 0)
-        keystore.shared_public_key = kwargs.pop("shared_public_key", "")
-        keystore.shared_withdrawal_credentials = kwargs.pop(
-            "shared_withdrawal_credentials", ""
+    def from_private_key(
+        cls,
+        *,
+        private_key: int,
+        password: str,
+        index: int = DEFAULT_INDEX,
+        threshold: int = DEFAULT_THRESHOLD,
+        shared_public_key: str = DEFAULT_SHARED_PUBLIC_KEY,
+        shared_withdrawal_credentials: str = DEFAULT_SHARED_WITHDRAWAL_CREDS
+    ) -> HorcruxPbkdf2Keystore:
+        parent_keystore = super().encrypt(
+            secret=private_key.to_bytes(length=32, byteorder="big"), password=password
+        )
+        # Ignored because mypy fails to detect parent dataclass keyword arguments
+        return cls(  # type: ignore
+            index=index,
+            threshold=threshold,
+            shared_public_key=shared_public_key,
+            shared_withdrawal_credentials=shared_withdrawal_credentials,
+            # parent dataclass keyword arguments
+            crypto=parent_keystore.crypto,
+            description=parent_keystore.description,
+            pubkey=parent_keystore.pubkey,
+            path=parent_keystore.path,
+            uuid=parent_keystore.uuid,
+            version=parent_keystore.version,
         )
 
-        return keystore
-
     @classmethod
-    def from_json(cls, json_dict: Dict[Any, Any]) -> Keystore:
-        keystore = super(Pbkdf2Keystore, cls).from_json(json_dict)
-        keystore.index = json_dict["index"]
-        keystore.threshold = json_dict["threshold"]
-        keystore.shared_public_key = json_dict["shared_public_key"]
-        keystore.shared_withdrawal_credentials = json_dict[
-            "shared_withdrawal_credentials"
-        ]
-
-        return keystore
-
-
-def create_keystore(
-    private_key: int,
-    shared_public_key: str,
-    shared_withdrawal_credentials: str,
-    index: int,
-    threshold: int,
-    password: str,
-) -> "Keystore":
-    """:returns new keystore with one key-pair."""
-    return HorcruxPbkdf2Keystore.encrypt(
-        secret=private_key.to_bytes(length=32, byteorder="big"),
-        password=password,
-        index=index,
-        threshold=threshold,
-        shared_public_key=shared_public_key,
-        shared_withdrawal_credentials=shared_withdrawal_credentials,
-    )
+    def from_json(cls, json_dict: Dict[Any, Any]) -> HorcruxPbkdf2Keystore:
+        parent_keystore = super().from_json(json_dict)
+        # Ignored because mypy fails to detect parent dataclass keyword arguments
+        return cls(  # type: ignore
+            index=json_dict["index"],
+            threshold=json_dict["threshold"],
+            shared_public_key=json_dict["shared_public_key"],
+            shared_withdrawal_credentials=json_dict["shared_withdrawal_credentials"],
+            # parent dataclass keyword arguments
+            crypto=parent_keystore.crypto,
+            description=parent_keystore.description,
+            pubkey=parent_keystore.pubkey,
+            path=parent_keystore.path,
+            uuid=parent_keystore.uuid,
+            version=parent_keystore.version,
+        )
 
 
 def get_polynomial_points(coefficients: List[int], num_points: int) -> List[int]:

@@ -13,7 +13,7 @@ from py_ecc.bls.ciphersuites import G2ProofOfPossession as bls_pop
 
 from cli.crypto import (
     PRIME,
-    create_keystore,
+    HorcruxPbkdf2Keystore,
     get_bls_secret_shares,
     rsa_decrypt,
     rsa_encrypt,
@@ -295,7 +295,7 @@ def create(
     )
 
     # save horcrux private key to the keystore
-    keystore = create_keystore(
+    keystore = HorcruxPbkdf2Keystore.from_private_key(
         private_key=horcrux_private_key,
         shared_public_key=public_key.hex(),
         shared_withdrawal_credentials=withdrawal_credentials.hex(),
