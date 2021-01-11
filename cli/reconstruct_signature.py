@@ -45,7 +45,7 @@ def reconstruct_signature(signatures: int) -> None:
                 f"({submitted + 1}/{signatures})"
             ),
             type=click.STRING,
-        )
+        ).strip()
         if signature.startswith("0x"):
             signature = signature[2:]
 

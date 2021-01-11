@@ -26,6 +26,7 @@ DATA_DIR = os.environ.get("DATA_DIR", os.path.join(os.getcwd(), "data"))
 )
 def sign(horcrux_file: str, horcrux_password: str) -> None:
     """Unlocks the keystore and signs the data."""
+    horcrux_file = horcrux_file.strip()
     if not os.path.exists(horcrux_file):
         raise click.BadParameter("Horcrux file does not exist.")
 
@@ -35,7 +36,7 @@ def sign(horcrux_file: str, horcrux_password: str) -> None:
 
     signing_data = click.prompt(
         text="Enter hexadecimal encoded data to sign", type=click.STRING
-    )
+    ).strip()
     if signing_data.startswith("0x"):
         signing_data = signing_data[2:]
 

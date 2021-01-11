@@ -127,7 +127,7 @@ def handle_dispatcher(
         with open(dispatcher_output_file, "r") as output_file:
             dispatcher_output_data = json.load(output_file)
     else:
-        endpoint = click.prompt("Enter dispatcher endpoint", type=click.STRING)
+        endpoint = click.prompt("Enter dispatcher endpoint", type=click.STRING).strip()
         submit_dispatcher_data(endpoint, input_data)
         dispatcher_output_data = poll_dispatcher(
             sender_rsa_public_key_hash=my_rsa_public_key_hash,
@@ -313,8 +313,11 @@ def create(
     with open(keystore_file, "w") as key_file:
         key_file.write(keystore.as_json())
     click.echo(f"Saved horcrux to {click.style(f'{keystore_file}', fg='green')}")
-    click.echo(
+    click.secho(
         "The horcrux file must be stored in a secure place."
-        " There will be no way to recover the horcrux if the file will be lost."
+        " There will be no way to recover the horcrux if the file will be lost.",
+        fg="blue",
     )
-    click.echo("Forgetting your password will also make your horcrux irrecoverable.")
+    click.secho(
+        "Forgetting your password will also make your horcrux irrecoverable.", fg="blue"
+    )
