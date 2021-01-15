@@ -7,6 +7,9 @@ from py_ecc.bls.ciphersuites import G2ProofOfPossession as bls_pop
 from cli.crypto import reconstruct_shared_bls_signature
 
 
+INVALID_NUMBER = "Invalid signatures number."
+
+
 @click.command()
 @click.option(
     "--signatures",
@@ -20,7 +23,7 @@ from cli.crypto import reconstruct_shared_bls_signature
 def reconstruct_signature(signatures: int) -> None:
     """Reconstructs BLS signatures using Shamir's secret sharing."""
     if signatures <= 0:
-        raise click.BadParameter("Invalid signatures number.")
+        raise click.BadParameter(message=INVALID_NUMBER)
 
     points: Dict[int, BLSSignature] = {}
     submitted = 0
