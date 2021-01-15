@@ -22,6 +22,8 @@ from cli.handle_dispatcher import poll_dispatcher, submit_dispatcher_data
 from cli.utils import get_read_file_path, get_write_file_path
 
 DATA_DIR = os.environ.get("DATA_DIR", os.path.join(os.getcwd(), "data"))
+INVALID_THRESHOLD = "Threshold must be >= 2."
+INVALID_THRESHOLD_TOTAL = "Threshold cannot be larger than the total number horcruxes."
 
 
 def handle_rsa_keys(total: int) -> Tuple[RsaKey, RsaKey, List[str]]:
@@ -251,11 +253,9 @@ def create(
     Runs in offline mode by default.
     """
     if threshold < 2:
-        raise click.BadParameter("Threshold must be >= 2.")
+        raise click.BadParameter(message=INVALID_THRESHOLD)
     if threshold > total:
-        raise click.BadParameter(
-            "Threshold cannot be larger than the total number horcruxes."
-        )
+        raise click.BadParameter(message=INVALID_THRESHOLD_TOTAL)
 
     # RSA keys are used for encrypting/decrypting messages for other horcrux holders
     my_rsa_private_key, my_rsa_public_key, all_rsa_public_keys = handle_rsa_keys(total)
