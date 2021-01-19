@@ -12,5 +12,11 @@ class Share(BaseModel):
 
 
 class ShareCreate(Share):
+    authentication_key: str
     sender_rsa_public_key_hash: str
     recipient_rsa_public_key_hash: str
+
+
+class SharesGet(BaseModel):
+    authentication_key: str
+    public_key_hash: str

@@ -1,3 +1,4 @@
+import os
 from typing import Iterator, List, Tuple
 
 from fastapi import Depends, FastAPI, HTTPException
@@ -24,6 +25,9 @@ def get_db() -> Iterator[Session]:
 def create_share(
     share: schemas.ShareCreate, db: Session = Depends(get_db)
 ) -> models.Share:
+    if share.authentication_key != os.environ["AUTHENTICATION_KEY"]:
+        raise HTTPException(status_code=403, detail="Permission denied.")
+
     if (
         crud.get_share(
             db=db,
@@ -38,9 +42,12 @@ def create_share(
     return crud.create_share(db=db, share=share)
 
 
-@app.get("/{public_key_hash}/", response_model=List[schemas.Share])
+@app.post("/shares/", response_model=List[schemas.Share])
 def get_shares(
-    public_key_hash: str, db: Session = Depends(get_db)
+    data: schemas.SharesGet, db: Session = Depends(get_db)
 ) -> List[Tuple[int, str, str, str, str, str, str]]:
-    shared = crud.get_shares(db=db, public_key_hash=public_key_hash)
+    if data.authentication_key != os.environ["AUTHENTICATION_KEY"]:
+        raise HTTPException(status_code=403, detail="Permission denied.")
+
+    shared = crud.get_shares(db=db, public_key_hash=data.public_key_hash)
     return shared

@@ -130,12 +130,14 @@ def handle_dispatcher(
             dispatcher_output_data = json.load(output_file)
     else:
         endpoint = click.prompt("Enter dispatcher endpoint", type=click.STRING).strip()
-        submit_dispatcher_data(endpoint, input_data)
+        auth_key = click.prompt("Enter the dispatcher authentication key", type=click.STRING).strip()
+        submit_dispatcher_data(endpoint, input_data, auth_key)
         dispatcher_output_data = poll_dispatcher(
             sender_rsa_public_key_hash=my_rsa_public_key_hash,
             endpoint=endpoint,
             total=total,
             offline_mode=offline_mode,
+            auth_key=auth_key
         )
 
     return dispatcher_output_data, my_index
