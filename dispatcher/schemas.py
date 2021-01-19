@@ -17,7 +17,7 @@ class ShareCreate(Share):
     recipient_rsa_public_key_hash: str
 
 
-class SharesGet(BaseModel):
+class SharesFetch(BaseModel):
     authentication_key: str
     public_key_hash: str
 

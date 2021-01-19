@@ -43,7 +43,7 @@ def poll_dispatcher(
         "authentication_key": auth_key,
     }
     url = os.path.join(endpoint, "shares", "")
-    response = requests.post(url, data)
+    response = requests.post(url, json=data)
     if response.status_code != 200:
         raise ValueError(
             "Failed to retrieve dispatcher output data: "
@@ -54,7 +54,7 @@ def poll_dispatcher(
     output_data = response.json()
     while len(output_data) != total - 1:
         time.sleep(5)
-        response = requests.post(url, data)
+        response = requests.post(url, json=data)
         if response.status_code != 200:
             raise ValueError(
                 "Failed to retrieve dispatcher output data: "

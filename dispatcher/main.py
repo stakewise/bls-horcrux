@@ -49,10 +49,10 @@ def health():
 
 @app.post("/shares/", response_model=List[schemas.Share])
 def get_shares(
-    data: schemas.SharesGet, db: Session = Depends(get_db)
+    data: schemas.SharesFetch, db: Session = Depends(get_db)
 ) -> List[Tuple[int, str, str, str, str, str, str]]:
     if data.authentication_key != os.environ["AUTHENTICATION_KEY"]:
         raise HTTPException(status_code=403, detail="Permission denied.")
 
-    shared = crud.get_shares(db=db, public_key_hash=data.public_key_hash)
-    return shared
+    shares = crud.get_shares(db=db, public_key_hash=data.public_key_hash)
+    return shares
