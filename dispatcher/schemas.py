@@ -20,3 +20,7 @@ class ShareCreate(Share):
 class SharesGet(BaseModel):
     authentication_key: str
     public_key_hash: str
+
+
+class Health(BaseModel):
+    status: str

@@ -42,6 +42,12 @@ def create_share(
     return crud.create_share(db=db, share=share)
 
 
+@app.get("/health/", response_model=schemas.Share)
+def health():
+    content = {"status": "OK"}
+    return schemas.Health(**content)
+
+
 @app.post("/shares/", response_model=List[schemas.Share])
 def get_shares(
     data: schemas.SharesGet, db: Session = Depends(get_db)
