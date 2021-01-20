@@ -91,7 +91,7 @@ def poll_dispatcher(
     "--submit-dispatcher-input",
     help="Defines whether dispatcher input should be submitted",
     show_default=True,
-    default=True,
+    default="yes",
     type=click.BOOL,
 )
 def handle_dispatcher(

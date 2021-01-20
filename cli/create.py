@@ -227,7 +227,7 @@ def process_dispatcher_output(
 )
 @click.option(
     "--offline-mode",
-    default=True,
+    default="yes",
     show_default=True,
     prompt="Enable horcrux creation offline mode"
     " (the data to the dispatcher should be submitted separately)",
@@ -308,7 +308,7 @@ def create(
     display_private_key = click.prompt(
         "Display the horcrux private key (e.g. to write it down)?",
         type=click.BOOL,
-        default=False,
+        default="no",
     )
     if display_private_key:
         base64_horcrux_key = b64encode(
