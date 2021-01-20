@@ -6,8 +6,10 @@ from typing import Any, Dict, List, Tuple, cast
 
 from Crypto.Cipher import AES, PKCS1_OAEP
 from Crypto.Cipher._mode_eax import EaxMode
+from Crypto.Hash import SHA256
 from Crypto.PublicKey.RSA import RsaKey
 from Crypto.Random import get_random_bytes
+from Crypto.Signature import pkcs1_15
 from eth2deposit.key_handling.keystore import Pbkdf2Keystore
 from eth_typing.bls import BLSPubkey, BLSSignature
 from py_ecc.bls.ciphersuites import G2ProofOfPossession as bls_pop
@@ -121,6 +123,20 @@ def rsa_encrypt(
     cipher_aes = cast(EaxMode, AES.new(session_key, AES.MODE_EAX))
     ciphertext, tag = cipher_aes.encrypt_and_digest(data.encode("utf-8"))
     return enc_session_key, cipher_aes.nonce, tag, ciphertext
+
+
+def rsa_sign(sender_private_key: RsaKey, ciphertext: bytes) -> bytes:
+    """Signs ciphertext with rsa private key."""
+    return pkcs1_15.new(sender_private_key).sign(SHA256.new(ciphertext))
+
+
+def rsa_verify(sender_public_key: RsaKey, ciphertext: bytes, signature: bytes) -> bool:
+    """Verifies ciphertext signed by RSA public key."""
+    try:
+        pkcs1_15.new(sender_public_key).verify(SHA256.new(ciphertext), signature)
+        return True
+    except (ValueError, TypeError):
+        return False
 
 
 def rsa_decrypt(

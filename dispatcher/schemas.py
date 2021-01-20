@@ -6,6 +6,7 @@ class Share(BaseModel):
     ciphertext: str
     tag: str
     nonce: str
+    signature: str
 
     class Config:
         orm_mode = True

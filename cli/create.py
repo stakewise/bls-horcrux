@@ -17,6 +17,8 @@ from cli.crypto import (
     get_bls_secret_shares,
     rsa_decrypt,
     rsa_encrypt,
+    rsa_sign,
+    rsa_verify,
 )
 from cli.handle_dispatcher import poll_dispatcher, submit_dispatcher_data
 from cli.utils import get_read_file_path, get_write_file_path
@@ -60,6 +62,7 @@ def handle_dispatcher(
     my_bls_public_key: str,
     my_bls_public_key_shares: List[str],
     my_bls_private_key_shares: List[int],
+    my_rsa_private_key: RsaKey,
     my_rsa_public_key: RsaKey,
     all_rsa_public_keys: List[str],
     offline_mode: bool,
@@ -88,6 +91,7 @@ def handle_dispatcher(
             recipient_public_key=recipient_rsa_public_key,
             data=json.dumps(encrypted_data),
         )
+        signature = rsa_sign(my_rsa_private_key, ciphertext)
 
         recipient_rsa_public_key_hash = SHA256(
             recipient_rsa_public_key.export_key("OpenSSH")
@@ -100,6 +104,7 @@ def handle_dispatcher(
                 "ciphertext": ciphertext.hex(),
                 "nonce": nonce.hex(),
                 "tag": tag.hex(),
+                "signature": signature.hex(),
             }
         )
 
@@ -143,6 +148,7 @@ def handle_dispatcher(
 
 def process_dispatcher_output(
     dispatcher_output: List[Dict[str, Any]],
+    all_rsa_public_keys: List[str],
     my_bls_public_key: BLSPubkey,
     my_bls_public_key_shares: List[BLSPubkey],
     my_bls_private_key_shares: List[int],
@@ -157,13 +163,22 @@ def process_dispatcher_output(
     horcrux_private_key_shares = [my_bls_private_key_shares[my_index]]
     horcrux_public_key_shares = [my_bls_public_key_shares[my_index]]
     for encrypted_data in dispatcher_output:
+        # verify the RSA signature
+        ciphertext = bytes.fromhex(encrypted_data["ciphertext"])
+        signature = bytes.fromhex(encrypted_data["signature"])
+        for rsa_public_key in all_rsa_public_keys:
+            if rsa_verify(RSA.import_key(rsa_public_key), ciphertext, signature):
+                break
+        else:
+            raise ValueError("Failed to verify the RSA signature.")
+
         data = json.loads(
             rsa_decrypt(
                 private_key=my_rsa_private_key,
                 enc_session_key=bytes.fromhex(encrypted_data["enc_session_key"]),
                 nonce=bytes.fromhex(encrypted_data["nonce"]),
                 tag=bytes.fromhex(encrypted_data["tag"]),
-                ciphertext=bytes.fromhex(encrypted_data["ciphertext"]),
+                ciphertext=ciphertext,
             )
         )
         recipient_bls_public_keys = [
@@ -278,6 +293,7 @@ def create(
         ],
         my_bls_private_key_shares=my_bls_private_key_shares,
         my_rsa_public_key=my_rsa_public_key,
+        my_rsa_private_key=my_rsa_private_key,
         all_rsa_public_keys=all_rsa_public_keys,
         offline_mode=offline_mode,
         total=total,
@@ -287,6 +303,7 @@ def create(
     # and BLS private key share
     public_key, withdrawal_credentials, horcrux_private_key = process_dispatcher_output(
         dispatcher_output=dispatcher_output,
+        all_rsa_public_keys=all_rsa_public_keys,
         my_bls_public_key=my_bls_public_key,
         my_bls_public_key_shares=my_bls_public_key_shares,
         my_bls_private_key_shares=my_bls_private_key_shares,
