@@ -1,5 +1,6 @@
 import json
 import os
+from base64 import b64encode
 from typing import Any, Dict, List, Tuple
 
 import click
@@ -303,6 +304,17 @@ def create(
         threshold=threshold,
         password=horcrux_password,
     )
+
+    display_private_key = click.prompt(
+        "Display the horcrux private key (e.g. to write it down)?",
+        type=click.BOOL,
+        default=False,
+    )
+    if display_private_key:
+        click.secho(
+            f'\n\n{b64encode(horcrux_private_key.to_bytes(length=32, byteorder="big")).decode("ascii")}\n\n',
+            fg="green",
+        )
 
     keystore_file = get_write_file_path(
         "Enter path to the file where the horcrux should be saved",
