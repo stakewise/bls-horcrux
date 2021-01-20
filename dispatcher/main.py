@@ -34,7 +34,7 @@ def create_share(
         sender_rsa_public_key_hash = SHA256(
             data.sender_rsa_public_key.encode("ascii")
         ).hex()
-    except:
+    except (ValueError, TypeError):
         raise HTTPException(status_code=400, detail="Invalid sender RSA public key")
 
     if not rsa_verify(rsa_public_key, ciphertext, signature):
