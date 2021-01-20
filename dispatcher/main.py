@@ -1,8 +1,11 @@
 from typing import Iterator, List, Tuple
 
+from Crypto.PublicKey import RSA
+from eth2deposit.utils.crypto import SHA256
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 
+from cli.crypto import rsa_verify
 from . import crud, models, schemas
 from .database import Base, SessionLocal, engine
 
@@ -22,20 +25,43 @@ def get_db() -> Iterator[Session]:
 
 @app.post("/", response_model=schemas.Share)
 def create_share(
-    share: schemas.ShareCreate, db: Session = Depends(get_db)
+    data: schemas.ShareCreate, db: Session = Depends(get_db)
 ) -> models.Share:
+    try:
+        ciphertext = bytes.fromhex(data.ciphertext)
+        signature = bytes.fromhex(data.signature)
+        rsa_public_key = RSA.import_key(data.sender_rsa_public_key)
+        sender_rsa_public_key_hash = SHA256(
+            data.sender_rsa_public_key.encode("ascii")
+        ).hex()
+    except:
+        raise HTTPException(status_code=400, detail="Invalid sender RSA public key")
+
+    if not rsa_verify(rsa_public_key, ciphertext, signature):
+        raise HTTPException(status_code=400, detail="Invalid RSA signature")
+
     if (
         crud.get_share(
             db=db,
-            sender_rsa_public_key_hash=share.sender_rsa_public_key_hash,
-            recipient_rsa_public_key_hash=share.recipient_rsa_public_key_hash,
+            sender_rsa_public_key_hash=sender_rsa_public_key_hash,
+            recipient_rsa_public_key_hash=data.recipient_rsa_public_key_hash,
         )
         is not None
     ):
         raise HTTPException(
             status_code=400, detail="The data for the participant was already submitted"
         )
-    return crud.create_share(db=db, share=share)
+
+    return crud.create_share(
+        db=db,
+        recipient_rsa_public_key_hash=data.recipient_rsa_public_key_hash,
+        sender_rsa_public_key_hash=sender_rsa_public_key_hash,
+        enc_session_key=data.enc_session_key,
+        ciphertext=data.ciphertext,
+        tag=data.tag,
+        nonce=data.nonce,
+        signature=data.signature,
+    )
 
 
 @app.get("/{public_key_hash}/", response_model=List[schemas.Share])
