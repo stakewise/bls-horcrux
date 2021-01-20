@@ -131,7 +131,7 @@ def rsa_sign(sender_private_key: RsaKey, ciphertext: bytes) -> bytes:
 
 
 def rsa_verify(sender_public_key: RsaKey, ciphertext: bytes, signature: bytes) -> bool:
-    """Verifies ciphertext signed by RSA public key."""
+    """Verifies ciphertext RSA signature."""
     try:
         pkcs1_15.new(sender_public_key).verify(SHA256.new(ciphertext), signature)
         return True
