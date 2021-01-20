@@ -311,8 +311,11 @@ def create(
         default=False,
     )
     if display_private_key:
+        base64_horcrux_key = b64encode(
+            horcrux_private_key.to_bytes(length=32, byteorder="big")
+        ).decode("ascii")
         click.secho(
-            f'\n\n{b64encode(horcrux_private_key.to_bytes(length=32, byteorder="big")).decode("ascii")}\n\n',
+            f"\n\n{base64_horcrux_key}\n\n",
             fg="green",
         )
 
