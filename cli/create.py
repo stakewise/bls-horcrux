@@ -1,5 +1,6 @@
 import json
 import os
+from base64 import b64encode
 from typing import Any, Dict, List, Tuple
 
 import click
@@ -226,7 +227,7 @@ def process_dispatcher_output(
 )
 @click.option(
     "--offline-mode",
-    default=True,
+    default="yes",
     show_default=True,
     prompt="Enable horcrux creation offline mode"
     " (the data to the dispatcher should be submitted separately)",
@@ -303,6 +304,20 @@ def create(
         threshold=threshold,
         password=horcrux_password,
     )
+
+    display_private_key = click.prompt(
+        "Display the horcrux private key (e.g. to write it down)?",
+        type=click.BOOL,
+        default="no",
+    )
+    if display_private_key:
+        base64_horcrux_key = b64encode(
+            horcrux_private_key.to_bytes(length=32, byteorder="big")
+        ).decode("ascii")
+        click.secho(
+            f"\n\n{base64_horcrux_key}\n\n",
+            fg="green",
+        )
 
     keystore_file = get_write_file_path(
         "Enter path to the file where the horcrux should be saved",
