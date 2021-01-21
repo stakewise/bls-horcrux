@@ -13,3 +13,4 @@ class Share(Base):
     ciphertext = Column(String)
     tag = Column(String)
     nonce = Column(String)
+    signature = Column(String)

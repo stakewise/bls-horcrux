@@ -112,7 +112,9 @@ def handle_dispatcher(
             input_data = json.load(input_file)
 
         submit_dispatcher_data(dispatcher_endpoint, input_data)
-        sender_rsa_public_key_hash = input_data[0]["sender_rsa_public_key_hash"]
+        sender_rsa_public_key_hash = SHA256(
+            input_data[0]["sender_rsa_public_key"].encode("ascii")
+        ).hex()
     else:
         rsa_public_key = click.prompt(
             text="Enter your RSA public key", type=click.STRING

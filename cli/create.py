@@ -18,6 +18,8 @@ from cli.crypto import (
     get_bls_secret_shares,
     rsa_decrypt,
     rsa_encrypt,
+    rsa_sign,
+    rsa_verify,
 )
 from cli.handle_dispatcher import poll_dispatcher, submit_dispatcher_data
 from cli.utils import get_read_file_path, get_write_file_path
@@ -27,17 +29,17 @@ INVALID_THRESHOLD = "Threshold must be >= 2."
 INVALID_THRESHOLD_TOTAL = "Threshold cannot be larger than the total number horcruxes."
 
 
-def handle_rsa_keys(total: int) -> Tuple[RsaKey, RsaKey, List[str]]:
+def handle_rsa_keys(total: int) -> Tuple[RsaKey, List[str]]:
     """
     Generates RSA keypair for communicating with other horcruxes
     and retrieves all the other horcruxes RSA public keys.
     """
     click.echo("Generating RSA key for communicating with other horcruxes...")
-    my_rsa_private_key = RSA.generate(4096)
-    my_rsa_public_key = my_rsa_private_key.publickey()
+    my_rsa_key = RSA.generate(4096)
 
     click.secho(
-        f'\n\n{my_rsa_public_key.export_key("OpenSSH").decode("ascii")}', fg="green"
+        f'\n\n{my_rsa_key.publickey().export_key("OpenSSH").decode("ascii")}',
+        fg="green",
     )
     click.echo("\n\nShare the RSA public key above with all other horcruxes")
 
@@ -54,14 +56,14 @@ def handle_rsa_keys(total: int) -> Tuple[RsaKey, RsaKey, List[str]]:
             f" actual={len(rsa_public_keys)}"
         )
 
-    return my_rsa_private_key, my_rsa_public_key, rsa_public_keys
+    return my_rsa_key, rsa_public_keys
 
 
 def handle_dispatcher(
     my_bls_public_key: str,
     my_bls_public_key_shares: List[str],
     my_bls_private_key_shares: List[int],
-    my_rsa_public_key: RsaKey,
+    my_rsa_key: RsaKey,
     all_rsa_public_keys: List[str],
     offline_mode: bool,
     total: int,
@@ -70,13 +72,13 @@ def handle_dispatcher(
     :returns dispatcher output data, index of the horcrux in shared BLS private key.
     """
     input_data = []
-    my_rsa_public_key_hash = SHA256(my_rsa_public_key.export_key("OpenSSH")).hex()
+    my_rsa_public_key_ssh = my_rsa_key.publickey().export_key("OpenSSH").decode("ascii")
     my_index = -1
     for i in range(len(all_rsa_public_keys)):
         recipient_rsa_public_key = RSA.import_key(all_rsa_public_keys[i])
         recipient_bls_private_key_share = my_bls_private_key_shares[i]
 
-        if recipient_rsa_public_key == my_rsa_public_key:
+        if recipient_rsa_public_key == my_rsa_key.publickey():
             my_index = i
             continue
 
@@ -89,18 +91,20 @@ def handle_dispatcher(
             recipient_public_key=recipient_rsa_public_key,
             data=json.dumps(encrypted_data),
         )
+        signature = rsa_sign(my_rsa_key, ciphertext)
 
         recipient_rsa_public_key_hash = SHA256(
             recipient_rsa_public_key.export_key("OpenSSH")
         ).hex()
         input_data.append(
             {
-                "sender_rsa_public_key_hash": my_rsa_public_key_hash,
+                "sender_rsa_public_key": my_rsa_public_key_ssh,
                 "recipient_rsa_public_key_hash": recipient_rsa_public_key_hash,
                 "enc_session_key": enc_session_key.hex(),
                 "ciphertext": ciphertext.hex(),
                 "nonce": nonce.hex(),
                 "tag": tag.hex(),
+                "signature": signature.hex(),
             }
         )
 
@@ -133,7 +137,9 @@ def handle_dispatcher(
         endpoint = click.prompt("Enter dispatcher endpoint", type=click.STRING).strip()
         submit_dispatcher_data(endpoint, input_data)
         dispatcher_output_data = poll_dispatcher(
-            sender_rsa_public_key_hash=my_rsa_public_key_hash,
+            sender_rsa_public_key_hash=SHA256(
+                my_rsa_public_key_ssh.encode("ascii")
+            ).hex(),
             endpoint=endpoint,
             total=total,
             offline_mode=offline_mode,
@@ -144,10 +150,11 @@ def handle_dispatcher(
 
 def process_dispatcher_output(
     dispatcher_output: List[Dict[str, Any]],
+    all_rsa_public_keys: List[str],
     my_bls_public_key: BLSPubkey,
     my_bls_public_key_shares: List[BLSPubkey],
     my_bls_private_key_shares: List[int],
-    my_rsa_private_key: RsaKey,
+    my_rsa_key: RsaKey,
     my_index: int,
 ) -> Tuple[BLSPubkey, bytes, int]:
     """
@@ -158,13 +165,22 @@ def process_dispatcher_output(
     horcrux_private_key_shares = [my_bls_private_key_shares[my_index]]
     horcrux_public_key_shares = [my_bls_public_key_shares[my_index]]
     for encrypted_data in dispatcher_output:
+        # verify the RSA signature
+        ciphertext = bytes.fromhex(encrypted_data["ciphertext"])
+        signature = bytes.fromhex(encrypted_data["signature"])
+        for rsa_public_key in all_rsa_public_keys:
+            if rsa_verify(RSA.import_key(rsa_public_key), ciphertext, signature):
+                break
+        else:
+            raise ValueError("Failed to verify the RSA signature.")
+
         data = json.loads(
             rsa_decrypt(
-                private_key=my_rsa_private_key,
+                private_key=my_rsa_key,
                 enc_session_key=bytes.fromhex(encrypted_data["enc_session_key"]),
                 nonce=bytes.fromhex(encrypted_data["nonce"]),
                 tag=bytes.fromhex(encrypted_data["tag"]),
-                ciphertext=bytes.fromhex(encrypted_data["ciphertext"]),
+                ciphertext=ciphertext,
             )
         )
         recipient_bls_public_keys = [
@@ -259,7 +275,7 @@ def create(
         raise click.BadParameter(message=INVALID_THRESHOLD_TOTAL)
 
     # RSA keys are used for encrypting/decrypting messages for other horcrux holders
-    my_rsa_private_key, my_rsa_public_key, all_rsa_public_keys = handle_rsa_keys(total)
+    my_rsa_key, all_rsa_public_keys = handle_rsa_keys(total)
 
     click.echo(
         f"Generating intermediate BLS keypair with Shamir's secret sharing:"
@@ -278,7 +294,7 @@ def create(
             pub_key.hex() for pub_key in my_bls_public_key_shares
         ],
         my_bls_private_key_shares=my_bls_private_key_shares,
-        my_rsa_public_key=my_rsa_public_key,
+        my_rsa_key=my_rsa_key,
         all_rsa_public_keys=all_rsa_public_keys,
         offline_mode=offline_mode,
         total=total,
@@ -288,10 +304,11 @@ def create(
     # and BLS private key share
     public_key, withdrawal_credentials, horcrux_private_key = process_dispatcher_output(
         dispatcher_output=dispatcher_output,
+        all_rsa_public_keys=all_rsa_public_keys,
         my_bls_public_key=my_bls_public_key,
         my_bls_public_key_shares=my_bls_public_key_shares,
         my_bls_private_key_shares=my_bls_private_key_shares,
-        my_rsa_private_key=my_rsa_private_key,
+        my_rsa_key=my_rsa_key,
         my_index=my_index,
     )
 
