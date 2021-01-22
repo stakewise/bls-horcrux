@@ -60,7 +60,7 @@ Before BLS horcruxes can be generated, their holders must agree on the following
 - **Dispatcher** - what endpoint should be used for the horcruxes to
   communicate ([See dispatcher](./dispatcher/README.md)).
 - **Offline PC** - a PC which is isolated from the Internet, where the final horcrux will be generated.
-- **Online PC** - a PC which connected to the Internet and is used for interacting with the dispatcher.
+- **Online PC** - a PC which is connected to the Internet and is used for interacting with the dispatcher.
 
 ### Individual
 
@@ -84,6 +84,7 @@ Choose how would you like to execute the commands required to generate your horc
 To create the BLS horcrux every participant must execute the following command and follow the steps after:
 
 ```shell script
+  ./horcrux.sh create-rsa-key
   linux-gnu
   Running BLS horcrux...
   Enter path to the file where the RSA private key should be saved [/bls-horcrux/data/rsa_key.pem]: 
