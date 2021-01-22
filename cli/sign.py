@@ -6,8 +6,6 @@ from py_ecc.bls.ciphersuites import G2ProofOfPossession as bls_pop
 
 from cli.crypto import HorcruxPbkdf2Keystore
 
-DATA_DIR = os.environ.get("DATA_DIR", os.path.join(os.getcwd(), "data"))
-
 
 @click.command()
 @click.option(
