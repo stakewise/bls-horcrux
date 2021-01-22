@@ -2,6 +2,7 @@ from pydantic import BaseModel
 
 
 class Share(BaseModel):
+    sender_rsa_public_key: str
     enc_session_key: str
     ciphertext: str
     tag: str
@@ -13,5 +14,14 @@ class Share(BaseModel):
 
 
 class ShareCreate(Share):
-    sender_rsa_public_key: str
-    recipient_rsa_public_key_hash: str
+    authentication_key: str
+    recipient_rsa_public_key: str
+
+
+class SharesFetch(BaseModel):
+    authentication_key: str
+    rsa_public_key: str
+
+
+class Health(BaseModel):
+    status: str

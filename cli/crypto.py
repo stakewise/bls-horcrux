@@ -2,15 +2,18 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from random import randint
+from secrets import randbits
 from typing import Any, Dict, List, Tuple, cast
+from uuid import uuid4
 
 from Crypto.Cipher import AES, PKCS1_OAEP
 from Crypto.Cipher._mode_eax import EaxMode
-from Crypto.Hash import SHA256
+from Crypto.Hash import SHA256 as _SHA256
 from Crypto.PublicKey.RSA import RsaKey
 from Crypto.Random import get_random_bytes
 from Crypto.Signature import pkcs1_15
 from eth2deposit.key_handling.keystore import Pbkdf2Keystore
+from eth2deposit.utils.crypto import AES_128_CTR, SHA256
 from eth_typing.bls import BLSPubkey, BLSSignature
 from py_ecc.bls.ciphersuites import G2ProofOfPossession as bls_pop
 from py_ecc.bls.g2_primitives import G2_to_signature, signature_to_G2
@@ -37,30 +40,30 @@ class HorcruxPbkdf2Keystore(Pbkdf2Keystore):  # type: ignore
     def create_from_private_key(
         cls,
         *,
-        private_key: int,
+        secret: bytes,
         password: str,
         index: int = DEFAULT_INDEX,
         threshold: int = DEFAULT_THRESHOLD,
         shared_public_key: str = DEFAULT_SHARED_PUBLIC_KEY,
         shared_withdrawal_credentials: str = DEFAULT_SHARED_WITHDRAWAL_CREDS
     ) -> HorcruxPbkdf2Keystore:
-        parent_keystore = super().encrypt(
-            secret=private_key.to_bytes(length=32, byteorder="big"), password=password
+        keystore = cls()
+        keystore.uuid = str(uuid4())
+        keystore.crypto.kdf.params["salt"] = randbits(256).to_bytes(32, "big")
+        decryption_key = keystore.kdf(
+            password=cls._process_password(password), **keystore.crypto.kdf.params
         )
-        # Ignored because mypy fails to detect parent dataclass keyword arguments
-        return cls(  # type: ignore
-            index=index,
-            threshold=threshold,
-            shared_public_key=shared_public_key,
-            shared_withdrawal_credentials=shared_withdrawal_credentials,
-            # parent dataclass keyword arguments
-            crypto=parent_keystore.crypto,
-            description=parent_keystore.description,
-            pubkey=parent_keystore.pubkey,
-            path=parent_keystore.path,
-            uuid=parent_keystore.uuid,
-            version=parent_keystore.version,
+        keystore.crypto.cipher.params["iv"] = randbits(128).to_bytes(16, "big")
+        cipher = AES_128_CTR(key=decryption_key[:16], **keystore.crypto.cipher.params)
+        keystore.crypto.cipher.message = cipher.encrypt(secret)
+        keystore.crypto.checksum.message = SHA256(
+            decryption_key[16:32] + keystore.crypto.cipher.message
         )
+        keystore.index = index
+        keystore.threshold = threshold
+        keystore.shared_public_key = shared_public_key
+        keystore.shared_withdrawal_credentials = shared_withdrawal_credentials
+        return keystore
 
     @classmethod
     def create_from_json(cls, json_dict: Dict[Any, Any]) -> HorcruxPbkdf2Keystore:
@@ -74,8 +77,6 @@ class HorcruxPbkdf2Keystore(Pbkdf2Keystore):  # type: ignore
             # parent dataclass keyword arguments
             crypto=parent_keystore.crypto,
             description=parent_keystore.description,
-            pubkey=parent_keystore.pubkey,
-            path=parent_keystore.path,
             uuid=parent_keystore.uuid,
             version=parent_keystore.version,
         )
@@ -127,13 +128,13 @@ def rsa_encrypt(
 
 def rsa_sign(sender_private_key: RsaKey, ciphertext: bytes) -> bytes:
     """Signs ciphertext with rsa private key."""
-    return pkcs1_15.new(sender_private_key).sign(SHA256.new(ciphertext))
+    return pkcs1_15.new(sender_private_key).sign(_SHA256.new(ciphertext))
 
 
 def rsa_verify(sender_public_key: RsaKey, ciphertext: bytes, signature: bytes) -> bool:
     """Verifies ciphertext RSA signature."""
     try:
-        pkcs1_15.new(sender_public_key).verify(SHA256.new(ciphertext), signature)
+        pkcs1_15.new(sender_public_key).verify(_SHA256.new(ciphertext), signature)
         return True
     except (ValueError, TypeError):
         return False

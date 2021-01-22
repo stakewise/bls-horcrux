@@ -6,8 +6,6 @@ from py_ecc.bls.ciphersuites import G2ProofOfPossession as bls_pop
 
 from cli.crypto import HorcruxPbkdf2Keystore
 
-DATA_DIR = os.environ.get("DATA_DIR", os.path.join(os.getcwd(), "data"))
-
 
 @click.command()
 @click.option(
@@ -46,3 +44,10 @@ def sign(horcrux_file: str, horcrux_password: str) -> None:
 
     click.echo(f"Signature: {click.style(f'0x{signature.hex()}', fg='green')}")
     click.echo(f"Horcrux index: {click.style(f'{keystore.index}', fg='green')}")
+    click.echo(
+        f"""Next steps:
+1) Retrieve signatures of the same signing data from other horcruxes.
+2) Run {click.style('./horcrux.sh reconstruct-signature', fg='blue')} to reconstruct the final signature.
+   {click.style(f'NB! At least {keystore.threshold} signatures are required to reconstruct.', fg='yellow')}
+"""
+    )

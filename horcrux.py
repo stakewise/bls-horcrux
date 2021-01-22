@@ -2,10 +2,13 @@ import sys
 
 import click
 
-from cli.create import create
-from cli.handle_dispatcher import handle_dispatcher
+from cli.create_horcrux import create_horcrux
+from cli.create_bls_key import create_bls_key
+from cli.pull_dispatcher import pull_dispatcher
 from cli.reconstruct_signature import reconstruct_signature
+from cli.create_rsa_key import create_rsa_key
 from cli.sign import sign
+from cli.submit_dispatcher import submit_dispatcher
 from cli.verify_signature import verify_signature
 
 
@@ -26,8 +29,11 @@ def cli() -> None:
     pass
 
 
-cli.add_command(create)
-cli.add_command(handle_dispatcher)
+cli.add_command(create_rsa_key)
+cli.add_command(create_bls_key)
+cli.add_command(submit_dispatcher)
+cli.add_command(pull_dispatcher)
+cli.add_command(create_horcrux)
 cli.add_command(sign)
 cli.add_command(reconstruct_signature)
 cli.add_command(verify_signature)
