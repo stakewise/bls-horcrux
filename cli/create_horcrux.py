@@ -168,7 +168,7 @@ def create_horcrux() -> None:
     display_private_key = click.prompt(
         "Display the horcrux private key (e.g. to write it down)",
         type=click.BOOL,
-        default=False,
+        default=False,  # type: ignore
     )
     if display_private_key:
         base64_horcrux_key = b64encode(

@@ -1,5 +1,5 @@
 import os
-from typing import Iterator, List, Tuple
+from typing import Iterator, List, Tuple, Dict
 
 from Crypto.PublicKey import RSA
 from fastapi import Depends, FastAPI, HTTPException
@@ -67,7 +67,7 @@ def create_share(
 
 
 @app.get("/health/", response_model=schemas.Health)
-def health():
+def health() -> Dict[str, str]:
     return {"status": "OK"}
 
 

@@ -5,10 +5,8 @@ from typing import Dict, List
 
 import click
 import requests
-from Crypto.PublicKey import RSA
-from eth2deposit.cli.generate_keys import get_password
 
-from cli.common import DATA_DIR, get_read_file_path, get_write_file_path
+from cli.common import DATA_DIR, get_write_file_path
 
 
 def poll_dispatcher(
