@@ -5,5 +5,3 @@ lint:
 	mypy dispatcher cli *.py
 
 .PHONY: test
-test:
-	pytest -v --cov .
