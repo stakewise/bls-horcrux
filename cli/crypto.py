@@ -49,19 +49,20 @@ class HorcruxPbkdf2Keystore(Pbkdf2Keystore):  # type: ignore
     ) -> HorcruxPbkdf2Keystore:
         keystore = cls()
         keystore.uuid = str(uuid4())
-        keystore.crypto.kdf.params['salt'] = randbits(256).to_bytes(32, 'big')
+        keystore.crypto.kdf.params["salt"] = randbits(256).to_bytes(32, "big")
         decryption_key = keystore.kdf(
-            password=cls._process_password(password),
-            **keystore.crypto.kdf.params
+            password=cls._process_password(password), **keystore.crypto.kdf.params
         )
-        keystore.crypto.cipher.params['iv'] = randbits(128).to_bytes(16, 'big')
+        keystore.crypto.cipher.params["iv"] = randbits(128).to_bytes(16, "big")
         cipher = AES_128_CTR(key=decryption_key[:16], **keystore.crypto.cipher.params)
         keystore.crypto.cipher.message = cipher.encrypt(secret)
-        keystore.crypto.checksum.message = SHA256(decryption_key[16:32] + keystore.crypto.cipher.message)
-        keystore.index = index,
-        keystore.threshold = threshold,
-        keystore.shared_public_key = shared_public_key,
-        keystore.shared_withdrawal_credentials = shared_withdrawal_credentials,
+        keystore.crypto.checksum.message = SHA256(
+            decryption_key[16:32] + keystore.crypto.cipher.message
+        )
+        keystore.index = index
+        keystore.threshold = threshold
+        keystore.shared_public_key = shared_public_key
+        keystore.shared_withdrawal_credentials = shared_withdrawal_credentials
         return keystore
 
     @classmethod
@@ -69,8 +70,8 @@ class HorcruxPbkdf2Keystore(Pbkdf2Keystore):  # type: ignore
         parent_keystore = super().from_json(json_dict)
         # Ignored because mypy fails to detect parent dataclass keyword arguments
         return cls(  # type: ignore
-            index=json_dict["index"][0],
-            threshold=json_dict["threshold"][0],
+            index=json_dict["index"],
+            threshold=json_dict["threshold"],
             shared_public_key=json_dict["shared_public_key"],
             shared_withdrawal_credentials=json_dict["shared_withdrawal_credentials"],
             # parent dataclass keyword arguments

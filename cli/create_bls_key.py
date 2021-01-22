@@ -199,4 +199,5 @@ def create_bls_key(total: int, threshold: int) -> None:
         f"""Next steps:
 1) Move {click.style(dispatcher_input_path, fg='blue')} to your online PC.
 2) Run {click.style('./horcrux.sh submit-dispatcher', fg='blue')} on your online PC.
-""")
+"""
+    )

@@ -40,4 +40,5 @@ def create_rsa_key() -> None:
    {click.style(os.path.join(DATA_DIR, 'all_rsa_public_keys.txt'), fg='blue')} file.
    {click.style(f'NB! The file must be equal for all the participants.', fg='yellow')}
 3) Run {click.style('./horcrux.sh create-bls-key', fg='blue')} on your offline PC.
-""")
+"""
+    )
