@@ -91,9 +91,9 @@ def generate_dispatcher_input(
     required=True,
     type=click.INT,
 )
-def generate_shares(total: int, threshold: int) -> None:
+def create_bls_key(total: int, threshold: int) -> None:
     """
-    Generates shares exchanged with other horcruxes.
+    Creates BLS key shares to exchange with other horcruxes.
     """
     if threshold < 2:
         raise click.BadParameter(message=INVALID_THRESHOLD)
@@ -195,3 +195,8 @@ def generate_shares(total: int, threshold: int) -> None:
     click.echo(
         "Saved interim BLS key to " f"{click.style(interim_bls_key_path, fg='green')}."
     )
+    click.echo(
+        f"""Next steps:
+1) Move {click.style(dispatcher_input_path, fg='blue')} to your online PC.
+2) Run {click.style('./horcrux.sh submit-dispatcher', fg='blue')} on your online PC.
+""")

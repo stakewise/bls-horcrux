@@ -27,12 +27,12 @@ from cli.crypto import (
 
 
 def process_dispatcher_output(
-    dispatcher_output: List[Dict[str, Any]],
-    my_bls_public_key: BLSPubkey,
-    my_bls_public_key_shares: List[BLSPubkey],
-    my_bls_private_key_shares: List[int],
-    my_rsa_key: RsaKey,
-    my_index: int,
+        dispatcher_output: List[Dict[str, Any]],
+        my_bls_public_key: BLSPubkey,
+        my_bls_public_key_shares: List[BLSPubkey],
+        my_bls_private_key_shares: List[int],
+        my_rsa_key: RsaKey,
+        my_index: int,
 ) -> Tuple[BLSPubkey, bytes, int]:
     """
     Processes output from the dispatcher to generate final
@@ -46,9 +46,9 @@ def process_dispatcher_output(
         ciphertext = bytes.fromhex(encrypted_data["ciphertext"])
         signature = bytes.fromhex(encrypted_data["signature"])
         if not rsa_verify(
-            RSA.import_key(encrypted_data["sender_rsa_public_key"]),
-            ciphertext,
-            signature,
+                RSA.import_key(encrypted_data["sender_rsa_public_key"]),
+                ciphertext,
+                signature,
         ):
             raise ValueError("Failed to verify the RSA signature.")
 
@@ -67,8 +67,8 @@ def process_dispatcher_output(
         horcrux_private_key_share = int(data["private_key_share"])
 
         if (
-            bls_pop.SkToPk(horcrux_private_key_share)
-            != recipient_bls_public_keys[my_index]
+                bls_pop.SkToPk(horcrux_private_key_share)
+                != recipient_bls_public_keys[my_index]
         ):
             raise ValueError("Received invalid BLS private key share.")
 
@@ -95,7 +95,7 @@ def process_dispatcher_output(
         horcrux_private_key %= PRIME
 
     if bls_pop.SkToPk(horcrux_private_key) != bls_pop._AggregatePKs(
-        horcrux_public_key_shares
+            horcrux_public_key_shares
     ):
         raise ValueError("Invalid calculated horcrux private key")
 
@@ -179,20 +179,22 @@ def create_horcrux() -> None:
             fg="green",
         )
 
-    keystore_file = get_write_file_path(
+    keystore_path = get_write_file_path(
         "Enter path to the file where the horcrux should be saved",
         os.path.join(DATA_DIR, f"horcrux{my_index}.json"),
     )
-    if keystore_file.startswith(DATA_DIR) and not os.path.exists(DATA_DIR):
+    if keystore_path.startswith(DATA_DIR) and not os.path.exists(DATA_DIR):
         os.mkdir(DATA_DIR)
-    with open(keystore_file, "w") as key_file:
+    with open(keystore_path, "w") as key_file:
         key_file.write(keystore.as_json())
-    click.echo(f"Saved horcrux to {click.style(f'{keystore_file}', fg='green')}")
+    click.echo(f"Saved horcrux to {click.style(f'{keystore_path}', fg='green')}")
     click.secho(
         "The horcrux file must be stored in a secure place."
-        " There will be no way to recover the horcrux if the file will be lost.",
-        fg="blue",
+        " There will be no way to recover the horcrux if the file will be lost."
+        " Forgetting your password will also make your horcrux irrecoverable.",
+        fg="yellow",
     )
-    click.secho(
-        "Forgetting your password will also make your horcrux irrecoverable.", fg="blue"
+    click.echo(
+        f"To sign data with your horcrux run\n"
+        f" {click.style(f'./horcrux.sh sign --horcrux-file {keystore_path}', fg='blue')}"
     )

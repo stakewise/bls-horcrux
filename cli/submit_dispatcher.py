@@ -52,3 +52,9 @@ def submit_dispatcher(dispatcher_endpoint: str, auth_key: str) -> None:
 
     submit_dispatcher_data(dispatcher_endpoint, input_data, auth_key)
     click.secho("Successfully submitted dispatcher data", fg="green")
+    click.echo(
+        f"""Next steps:
+1) Wait for other participants to submit their dispatcher input.
+2) Run {click.style('./horcrux.sh pull-dispatcher', fg='blue')} on your online PC.
+"""
+    )

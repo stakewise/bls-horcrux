@@ -69,37 +69,38 @@ def poll_dispatcher(
 )
 def pull_dispatcher(dispatcher_endpoint: str, auth_key: str, total: int) -> None:
     """Pulls data from the dispatcher or waits once all the horcruxes submit their input"""
-    # fetch my RSA key
-    my_rsa_key_path = get_read_file_path(
-        "Enter path to the file where the RSA key is stored",
-        os.path.join(DATA_DIR, "rsa_key.pem"),
-    )
-    password = get_password(text="Enter your RSA key password")
-
-    with open(my_rsa_key_path, "r") as f:
-        my_rsa_key = RSA.import_key(f.read(), passphrase=password)
+    # get RSA public key
+    rsa_public_key = click.prompt(
+        text="Enter your RSA public key", type=click.STRING
+    ).strip()
 
     # pull dispatcher
     dispatcher_output_data = poll_dispatcher(
-        rsa_public_key=my_rsa_key.publickey().export_key("OpenSSH").decode("ascii"),
+        rsa_public_key=rsa_public_key,
         endpoint=dispatcher_endpoint,
         total=total,
         auth_key=auth_key,
     )
 
     # save dispatcher output
-    dispatcher_output_file = get_write_file_path(
+    dispatcher_output_path = get_write_file_path(
         "Enter path to the file where the dispatcher output should be saved",
         os.path.join(DATA_DIR, "dispatcher_output.json"),
     )
 
-    if dispatcher_output_file.startswith(DATA_DIR) and not os.path.exists(DATA_DIR):
+    if dispatcher_output_path.startswith(DATA_DIR) and not os.path.exists(DATA_DIR):
         os.mkdir(DATA_DIR)
 
-    with open(dispatcher_output_file, "w") as dispatcher_file:
+    with open(dispatcher_output_path, "w") as dispatcher_file:
         json.dump(dispatcher_output_data, dispatcher_file)
 
     click.echo(
         "Saved dispatcher output data to "
-        f"{click.style(f'{dispatcher_output_file}', fg='green')}"
+        f"{click.style(f'{dispatcher_output_path}', fg='green')}"
+    )
+    click.echo(
+        f"""Next steps:
+1) Move {click.style(dispatcher_output_path, fg='blue')} to your offline PC.
+2) Run {click.style('./horcrux.sh create-horcrux', fg='blue')} on your offline PC.
+"""
     )

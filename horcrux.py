@@ -3,7 +3,7 @@ import sys
 import click
 
 from cli.create_horcrux import create_horcrux
-from cli.generate_shares import generate_shares
+from cli.create_bls_key import create_bls_key
 from cli.pull_dispatcher import pull_dispatcher
 from cli.reconstruct_signature import reconstruct_signature
 from cli.create_rsa_key import create_rsa_key
@@ -30,7 +30,7 @@ def cli() -> None:
 
 
 cli.add_command(create_rsa_key)
-cli.add_command(generate_shares)
+cli.add_command(create_bls_key)
 cli.add_command(submit_dispatcher)
 cli.add_command(pull_dispatcher)
 cli.add_command(create_horcrux)

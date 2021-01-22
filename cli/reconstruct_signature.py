@@ -67,3 +67,7 @@ def reconstruct_signature(signatures: int) -> None:
         "Reconstructed signature: "
         f"{click.style(f'0x{reconstructed_signature.hex()}', fg='green')}"
     )
+    click.echo(
+        f"Run {click.style('./horcrux.sh verify-signature', fg='blue')}"
+        f" to verify whether the signature is correct."
+    )
