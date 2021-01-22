@@ -1,7 +1,7 @@
+import os
 from typing import Iterator, List, Tuple
 
 from Crypto.PublicKey import RSA
-from eth2deposit.utils.crypto import SHA256
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 
@@ -12,6 +12,8 @@ from .database import Base, SessionLocal, engine
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+AUTHENTICATION_KEY = os.environ["AUTHENTICATION_KEY"]
 
 
 # Dependency
@@ -27,13 +29,13 @@ def get_db() -> Iterator[Session]:
 def create_share(
     data: schemas.ShareCreate, db: Session = Depends(get_db)
 ) -> models.Share:
+    if data.authentication_key != AUTHENTICATION_KEY:
+        raise HTTPException(status_code=403, detail="Permission denied.")
+
     try:
         ciphertext = bytes.fromhex(data.ciphertext)
         signature = bytes.fromhex(data.signature)
         rsa_public_key = RSA.import_key(data.sender_rsa_public_key)
-        sender_rsa_public_key_hash = SHA256(
-            data.sender_rsa_public_key.encode("ascii")
-        ).hex()
     except (ValueError, TypeError):
         raise HTTPException(status_code=400, detail="Invalid sender RSA public key")
 
@@ -43,8 +45,8 @@ def create_share(
     if (
         crud.get_share(
             db=db,
-            sender_rsa_public_key_hash=sender_rsa_public_key_hash,
-            recipient_rsa_public_key_hash=data.recipient_rsa_public_key_hash,
+            sender_rsa_public_key=data.sender_rsa_public_key,
+            recipient_rsa_public_key=data.recipient_rsa_public_key,
         )
         is not None
     ):
@@ -54,8 +56,8 @@ def create_share(
 
     return crud.create_share(
         db=db,
-        recipient_rsa_public_key_hash=data.recipient_rsa_public_key_hash,
-        sender_rsa_public_key_hash=sender_rsa_public_key_hash,
+        sender_rsa_public_key=data.sender_rsa_public_key,
+        recipient_rsa_public_key=data.recipient_rsa_public_key,
         enc_session_key=data.enc_session_key,
         ciphertext=data.ciphertext,
         tag=data.tag,
@@ -64,9 +66,17 @@ def create_share(
     )
 
 
-@app.get("/{public_key_hash}/", response_model=List[schemas.Share])
+@app.get("/health/", response_model=schemas.Health)
+def health():
+    return {"status": "OK"}
+
+
+@app.post("/shares/", response_model=List[schemas.Share])
 def get_shares(
-    public_key_hash: str, db: Session = Depends(get_db)
+    data: schemas.SharesFetch, db: Session = Depends(get_db)
 ) -> List[Tuple[int, str, str, str, str, str, str]]:
-    shared = crud.get_shares(db=db, public_key_hash=public_key_hash)
-    return shared
+    if data.authentication_key != AUTHENTICATION_KEY:
+        raise HTTPException(status_code=403, detail="Permission denied.")
+
+    shares = crud.get_shares(db=db, recipient_rsa_public_key=data.rsa_public_key)
+    return shares
