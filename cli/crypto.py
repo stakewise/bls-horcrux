@@ -69,7 +69,7 @@ class HorcruxPbkdf2Keystore(Pbkdf2Keystore):  # type: ignore
     def create_from_json(cls, json_dict: Dict[Any, Any]) -> HorcruxPbkdf2Keystore:
         parent_keystore = super().from_json(json_dict)
         # Ignored because mypy fails to detect parent dataclass keyword arguments
-        return cls(  # type: ignore
+        return cls(
             index=json_dict["index"],
             threshold=json_dict["threshold"],
             shared_public_key=json_dict["shared_public_key"],
