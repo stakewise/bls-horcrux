@@ -132,9 +132,9 @@ eth-utils==1.10.0 \
 https://github.com/ethereum/eth2.0-deposit-cli/archive/v1.1.0.zip \
     --hash=sha256:05427b6cb45135f6ae3a2191785e179b609229c17ca3ec5248bee0dfd929ccf9
     # via -r requirements/prod.in
-fastapi==0.63.0 \
-    --hash=sha256:63c4592f5ef3edf30afa9a44fa7c6b7ccb20e0d3f68cd9eba07b44d552058dcb \
-    --hash=sha256:98d8ea9591d8512fdadf255d2a8fa56515cdd8624dca4af369da73727409508e
+fastapi==0.65.2 \
+    --hash=sha256:39569a18914075b2f1aaa03bcb9dc96a38e0e5dabaf3972e088c9077dfffa379 \
+    --hash=sha256:8359e55d8412a5571c0736013d90af235d6949ec4ce978e9b63500c8f4b6f714
     # via -r requirements/prod.in
 h11==0.14.0 \
     --hash=sha256:8f19fbbe99e72420ff35c00b27a34cb9937e902a8b810e2c88300c6f0a3b699d \
