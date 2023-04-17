@@ -55,7 +55,7 @@ def sign(
     # decrypt and sign data
     private_key = int.from_bytes(keystore.decrypt(horcrux_password), "big")
 
-    click.echo(f"Signing payloads...")
+    click.echo("Signing payloads...")
     signatures = {}
     for index, payload in payloads.items():
         signature = bls_pop.Sign(private_key, bytes.fromhex(payload))
