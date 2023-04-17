@@ -47,7 +47,7 @@ eth-utils==1.9.5 \
     #   py-ecc
     #   ssz
 https://github.com/ethereum/eth2.0-deposit-cli/archive/v1.1.0.zip \
-    --hash=sha256:08c2c838d99769c1239d6c32426b381e97c31d512d1d6c48ba2ee985c0c2922e
+    --hash=sha256:05427b6cb45135f6ae3a2191785e179b609229c17ca3ec5248bee0dfd929ccf9
     # via -r requirements/prod.in
 fastapi==0.63.0 \
     --hash=sha256:63c4592f5ef3edf30afa9a44fa7c6b7ccb20e0d3f68cd9eba07b44d552058dcb \
