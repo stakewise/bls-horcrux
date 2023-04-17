@@ -12,7 +12,7 @@ from cli.crypto import HorcruxPbkdf2Keystore
     "--payloads-file",
     required=False,
     help="The path to the file containing signing payloads. Defaults to ./payloads.json",
-    default='./payloads.json',
+    default="./payloads.json",
     type=click.Path(exists=True, file_okay=True, dir_okay=False),
 )
 @click.option(
@@ -36,7 +36,9 @@ from cli.crypto import HorcruxPbkdf2Keystore
         for your password as otherwise it will appear in your shell history.)""",
     prompt="Enter the horcrux password used during your horcrux creation",
 )
-def sign(payloads_file: str, output_file: str, horcrux_file: str, horcrux_password: str) -> None:
+def sign(
+    payloads_file: str, output_file: str, horcrux_file: str, horcrux_password: str
+) -> None:
     """Unlocks the keystore and signs the data."""
     horcrux_file = horcrux_file.strip()
     if not os.path.exists(horcrux_file):
