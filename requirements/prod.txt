@@ -337,9 +337,9 @@ ssz==0.2.4 \
     --hash=sha256:3c944cd97a38448fe2b145d80d704bd28bc3c5368da9624177b0964e37adaf7e \
     --hash=sha256:99c4a7bbaf632113fc28beb8770673637286f7fdade1231e0a2c6fae6331c06d
     # via -r requirements/prod.in
-starlette==0.13.6 \
-    --hash=sha256:bd2ffe5e37fb75d014728511f8e68ebf2c80b0fa3d04ca1479f4dc752ae31ac9 \
-    --hash=sha256:ebe8ee08d9be96a3c9f31b2cb2a24dbdf845247b745664bd8a3f9bd0c977fdbc
+starlette==0.25.0 \
+    --hash=sha256:774f1df1983fd594b9b6fb3ded39c2aa1979d10ac45caac0f4255cbe2acb8628 \
+    --hash=sha256:854c71e73736c429c2bdb07801f2c76c9cba497e7c3cf4988fde5e95fe4cdb3c
     # via fastapi
 toolz==0.12.0 \
     --hash=sha256:2059bd4148deb1884bb0eb770a3cde70e7f954cfbbdc2285f1f2de01fd21eb6f \
